@@ -1,0 +1,430 @@
+/* ==========================================================================
+   THE LEDGER — UI COMPONENTS & PRIMITIVES
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. BUTTONS & CONTROLS
+   -------------------------------------------------------------------------- */
+.btn-brass-primary {
+  padding: 10px 18px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #1A1408;
+  border: none;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(201, 164, 103, 0.3);
+  transition: transform var(--trans-fast), background var(--trans-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+.btn-brass-primary:active { transform: scale(0.96); }
+
+.btn-brass-secondary {
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background var(--trans-fast), border-color var(--trans-fast);
+}
+.btn-brass-secondary:hover { border-color: var(--border-strong); }
+
+.btn-brass-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: none;
+  transition: transform var(--trans-fast);
+}
+.btn-brass-icon:active { transform: scale(0.92); }
+
+.nav-link-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-sec);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--trans-fast);
+  width: 100%;
+  text-align: left;
+}
+.nav-link-btn:hover {
+  background: var(--card);
+  color: var(--text);
+  border-color: var(--border);
+}
+.nav-link-btn.active {
+  background: var(--card);
+  color: var(--accent);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-tab-brass {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  color: var(--text-muted);
+  font-size: 9.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: none;
+  min-width: 48px;
+  transition: color var(--trans-fast);
+}
+.nav-tab-brass.active { color: var(--accent); font-weight: 700; }
+.nav-tab-brass span:first-child { font-size: 18px; }
+
+.brass-fab {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+  color: #1A1408;
+  border: none;
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow-fab);
+  cursor: pointer;
+  margin-top: -22px;
+  font-size: 22px;
+  font-weight: 700;
+  transition: transform var(--trans-fast);
+}
+.brass-fab:active { transform: scale(0.92); }
+
+/* --------------------------------------------------------------------------
+   2. CARDS & WELLS
+   -------------------------------------------------------------------------- */
+.l-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.hero-ledger-panel {
+  position: relative;
+  border-radius: 22px;
+  padding: 24px;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--card) 0%, var(--card-alt) 60%, var(--card) 100%);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow);
+}
+.hero-ledger-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 85% -10%, var(--accent-soft), transparent 55%);
+  pointer-events: none;
+}
+
+.kpi-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+
+.table-card-desktop {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* --------------------------------------------------------------------------
+   3. FORMS & INPUTS
+   -------------------------------------------------------------------------- */
+.l-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 11px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-size: 13.5px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color var(--trans-fast);
+}
+.l-input:focus { border-color: var(--accent); }
+
+.top-search-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text-muted);
+  font-size: 13px;
+  width: 340px;
+  cursor: pointer;
+}
+.kbd-pill {
+  margin-left: auto;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  background: var(--bg-elevated);
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+/* --------------------------------------------------------------------------
+   4. PILLS, CHIPS & SEGMENTED CONTROLS
+   -------------------------------------------------------------------------- */
+.l-chip {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text-sec);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--trans-fast);
+}
+.l-chip.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.l-segmented {
+  display: flex;
+  background: var(--bg-elevated);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+}
+.l-seg-btn {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 9px;
+  border: none;
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 600;
+  background: transparent;
+  color: var(--text-muted);
+  transition: all var(--trans-fast);
+}
+.l-seg-btn.active {
+  background: var(--card);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+/* --------------------------------------------------------------------------
+   5. TABLES & ROW ITEMS
+   -------------------------------------------------------------------------- */
+.ledger-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+.ledger-table th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+.ledger-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.ledger-table tr:last-child td { border-bottom: none; }
+.ledger-table tr:hover td { background: var(--bg-elevated); cursor: pointer; }
+
+.tx-item-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 4px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+}
+.tx-item-btn:last-child { border-bottom: none; }
+
+.tx-icon-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  background: rgba(201, 164, 103, 0.12) !important;
+  border: 1px solid rgba(245, 242, 233, 0.1) !important;
+  line-height: 1;
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+}
+
+/* Category Grid & Pill Badges */
+.cat-pill-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  background: rgba(201, 164, 103, 0.12) !important;
+  border: 1px solid rgba(245, 242, 233, 0.1) !important;
+  line-height: 1;
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+}
+
+.cat-picker-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border-radius: 12px;
+  border: 1px solid var(--border) !important;
+  background: var(--card) !important;
+  cursor: pointer;
+  transition: all var(--trans-fast);
+  color: var(--text);
+}
+.cat-picker-btn.active {
+  border-color: var(--accent) !important;
+  background: var(--accent-soft) !important;
+}
+
+/* --------------------------------------------------------------------------
+   6. MODALS & BOTTOM SHEETS
+   -------------------------------------------------------------------------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  z-index: 100;
+  display: none;
+  place-items: center;
+}
+.modal-overlay.open { display: grid; }
+
+.modal-dialog {
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg-elevated);
+  border-radius: 22px;
+  border: 1px solid var(--border-strong);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sheet-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 150;
+  display: none;
+  opacity: 0;
+  transition: opacity var(--trans-fast);
+  justify-content: center;
+  align-items: flex-end;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.sheet-overlay.open { display: flex; opacity: 1; }
+
+.bottom-sheet-panel {
+  width: 100%;
+  max-width: 460px;
+  background: var(--bg-elevated);
+  border-radius: 24px 24px 0 0;
+  padding: 16px 18px calc(24px + var(--safe-bottom));
+  box-shadow: var(--shadow);
+  transform: translateY(100%);
+  transition: transform 240ms cubic-bezier(0.2, 0.9, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 88%;
+  overflow-y: auto;
+  box-sizing: border-box;
+  margin: 0;
+}
+.sheet-overlay.open .bottom-sheet-panel { transform: translateY(0); }
+
+.sheet-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 99px;
+  background: var(--border-strong);
+  margin: -8px auto 8px;
+}
+
+/* Toast */
+.l-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 84px;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--text);
+  color: var(--bg);
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  z-index: 80;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 180ms ease;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.l-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }

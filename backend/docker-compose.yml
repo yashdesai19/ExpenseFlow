@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  # ----------------------------------------------------------------------------
+  # PostgreSQL Database Service
+  # ----------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: expenseflow_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: expenseflow_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d expenseflow_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------------------------------
+  # FastAPI Backend Application Service
+  # ----------------------------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: expenseflow_api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PROJECT_NAME: "ExpenseFlow Pro"
+      API_V1_STR: "/api/v1"
+      ENVIRONMENT: "production"
+      DEBUG: "False"
+      DATABASE_URL: "postgresql://postgres:postgrespassword@postgres:5432/expenseflow_db"
+      JWT_SECRET_KEY: "production-jwt-secret-replace-with-secure-32-byte-hex"
+      JWT_ALGORITHM: "HS256"
+      ACCESS_TOKEN_EXPIRE_MINUTES: 1440
+      BACKEND_CORS_ORIGINS: '["http://localhost:3000","http://localhost:8080","http://127.0.0.1:5500"]'
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:
+    driver: local
