@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.core.security import get_password_hash, verify_password, create_access_token
+from app.core.security import get_password_hash, verify_password, create_access_token, DUMMY_PASSWORD_HASH
 from app.models.user import User
 from app.models.category import Category
 from app.models.settings import UserSettings
@@ -99,9 +99,18 @@ class AuthService:
         Validates user credentials, verifies account status, and records audit trail.
         """
         user = user_repo.get_by_email(db, email=login_data.email)
-        
-        # Prevent timing attacks: always verify password even if user is None (dummy verify if needed)
-        if not user or not verify_password(login_data.password, user.hashed_password):
+
+        # Prevent timing attacks: always verify password even if user doesn't exist
+        # (use a dummy hash comparison to equalize response times)
+        if user is None:
+            verify_password(login_data.password, DUMMY_PASSWORD_HASH)  # Dummy verify for timing safety
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid email or password.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        if not verify_password(login_data.password, user.hashed_password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid email or password.",

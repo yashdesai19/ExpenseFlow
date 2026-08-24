@@ -7,7 +7,7 @@ window.APP_UTILS = {
    */
   formatMoney: function(amount, symbol = "₹") {
     const n = Math.abs(Number(amount) || 0);
-    return symbol + Math.round(n).toLocaleString("en-IN");
+    return symbol + n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   },
 
   getCategoryIcon: function(icon, name = "") {
@@ -100,18 +100,6 @@ window.APP_UTILS = {
     link.download = filename;
     link.click();
     this.showToast("CSV Export downloaded");
-  },
-
-  /**
-   * Downloads JSON state as backup file
-   */
-  downloadJSON: function(filename, data) {
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
-    link.click();
-    this.showToast("JSON Backup downloaded");
   },
 
   /**

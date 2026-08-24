@@ -58,7 +58,7 @@ window.APP_STATE = {
           name: c.name,
           icon: window.APP_UTILS.getCategoryIcon(c.icon, c.name),
           color: c.color || "#A9793F",
-          budget: c.budget_limit || 25000
+          budget: 25000
         }));
       }
 
@@ -146,12 +146,17 @@ window.APP_STATE = {
           cat = this.data.categories[0];
         }
 
-        const catId = (cat && typeof cat.id === "number") ? cat.id : (parseInt(cat?.id, 10) || 1);
+        // Handle both numeric DB IDs and frontend string IDs
+        const catId = (cat && cat.id != null) ? parseInt(cat.id, 10) : 1;
+        if (isNaN(catId) || catId < 1) {
+          console.warn("[DB] Could not resolve valid category ID for expense");
+          return;
+        }
 
         const payload = {
           amount: parseFloat(tx.amount),
           description: tx.description || (tx.type === "income" ? "Income" : "Expense"),
-          category_id: parseInt(catId, 10),
+          category_id: catId,
           account: tx.account || "Checking Account",
           date: tx.date || new Date().toISOString().slice(0, 10),
           notes: tx.notes || ""
@@ -273,38 +278,4 @@ window.APP_STATE = {
     window.APP_UTILS.showToast(`Currency updated to ${code} (${symbol})`);
   },
 
-  downloadCloudBackup() {
-    const backupData = {
-      version: "2.4.0",
-      timestamp: new Date().toISOString(),
-      userProfile: this.data.userProfile,
-      currency: { code: this.data.currencyCode, symbol: this.data.currencySymbol },
-      categories: this.data.categories,
-      transactions: this.data.transactions
-    };
-    window.APP_UTILS.downloadJSON(`TheLedger_Backup_${new Date().toISOString().slice(0,10)}.json`, backupData);
-  },
-
-  restoreBackupData(jsonString) {
-    try {
-      const parsed = JSON.parse(jsonString);
-      if (Array.isArray(parsed.transactions)) {
-        this.data.transactions = parsed.transactions;
-      }
-      if (Array.isArray(parsed.categories)) {
-        this.data.categories = parsed.categories;
-      }
-      if (parsed.userProfile) {
-        this.data.userProfile = { ...this.data.userProfile, ...parsed.userProfile };
-      }
-      if (parsed.currency) {
-        this.data.currencyCode = parsed.currency.code || this.data.currencyCode;
-        this.data.currencySymbol = parsed.currency.symbol || this.data.currencySymbol;
-      }
-      this.notify();
-      window.APP_UTILS.showToast("Backup restored successfully!");
-    } catch (e) {
-      window.APP_UTILS.showToast("Invalid backup JSON file");
-    }
-  }
 };

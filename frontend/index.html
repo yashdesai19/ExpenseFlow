@@ -315,25 +315,6 @@
             </div>
             <button class="btn-brass-secondary" onclick="window.APP_DESKTOP.exportCSV()">📥 Download CSV</button>
           </div>
-
-          <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border);">
-            <div>
-              <strong>Cloud Snapshot</strong>
-              <div style="font-size:12px; color:var(--text-muted);">Download full JSON encrypted backup</div>
-            </div>
-            <button class="btn-brass-secondary" onclick="window.APP_STATE.downloadCloudBackup()">💾 Save Backup</button>
-          </div>
-
-          <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0;">
-            <div>
-              <strong>Restore Backup</strong>
-              <div style="font-size:12px; color:var(--text-muted);">Upload previously exported JSON</div>
-            </div>
-            <label class="btn-brass-secondary" style="cursor:pointer; margin:0;">
-              📤 Restore File
-              <input type="file" accept=".json" style="display:none;" onchange="window.APP_DESKTOP.handleRestoreFile(event)">
-            </label>
-          </div>
         </div>
 
       </div>

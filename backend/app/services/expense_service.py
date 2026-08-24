@@ -166,6 +166,8 @@ class ExpenseService:
             details={
                 "amount": str(updated_expense.amount),
                 "description": updated_expense.description,
+                "account": updated_expense.account,
+                "category_id": updated_expense.category_id,
             },
             ip_address=ip_address,
         )

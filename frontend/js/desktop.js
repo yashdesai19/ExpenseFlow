@@ -212,17 +212,6 @@ window.APP_DESKTOP = {
     window.APP_STATE.setCurrency(code, sym);
   },
 
-  handleRestoreFile(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      window.APP_STATE.restoreBackupData(event.target.result);
-      e.target.value = "";
-    };
-    reader.readAsText(file);
-  },
-
   renderTableRows(list) {
     const tableBody = document.getElementById("dTransactionTableBody");
     if (!tableBody) return;
@@ -320,8 +309,17 @@ window.APP_DESKTOP = {
     const amt = parseFloat(amtInput ? amtInput.value : "0");
     const desc = descInput ? descInput.value.trim() : "";
     const acct = acctInput ? acctInput.value : "Business";
-    const cat = catInput ? catInput.value : "cat-software";
+    const cat = catInput ? catInput.value : "";
     const date = (dateInput && dateInput.value) ? dateInput.value : new Date().toISOString().slice(0, 10);
+
+    // Resolve category name from select for proper backend sync
+    const state = window.APP_STATE.data;
+    const catSelect = catInput;
+    let catName = cat;
+    if (catSelect) {
+      const selectedOption = catSelect.options ? catSelect.options[catSelect.selectedIndex] : null;
+      if (selectedOption) catName = selectedOption.textContent || cat;
+    }
 
     if (!amt || isNaN(amt) || amt <= 0) {
       window.APP_UTILS.showToast("Please enter a valid positive amount");
@@ -339,6 +337,7 @@ window.APP_DESKTOP = {
       date,
       description: desc,
       categoryId: cat,
+      categoryName: catName,
       account: acct,
       type: "expense",
       amount: amt,

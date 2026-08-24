@@ -46,6 +46,7 @@ class RecurringExpenseResponse(RecurringExpenseBase):
     next_due_date: dt.date
     is_active: bool
     created_at: dt.datetime
+    updated_at: dt.datetime | None = None
     category: Optional[CategoryResponse] = None
 
     model_config = ConfigDict(from_attributes=True)

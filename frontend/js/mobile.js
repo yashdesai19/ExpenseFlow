@@ -616,11 +616,18 @@ window.APP_MOBILE = {
       return;
     }
 
+    // Resolve category name from the selected category
+    const state = window.APP_STATE.data;
+    const catIdForTx = this.activeTxType === "income" ? "cat-income" : (this.selectedCatId || "cat-software");
+    const selectedCat = state.categories.find(c => String(c.id) === String(catIdForTx));
+    const catNameForTx = (selectedCat && selectedCat.name) || catIdForTx;
+
     const newTx = {
       id: "tx-" + Date.now(),
       date,
       description: desc,
-      categoryId: this.activeTxType === "income" ? "cat-income" : (this.selectedCatId || "cat-software"),
+      categoryId: catIdForTx,
+      categoryName: catNameForTx,
       account: acct,
       type: this.activeTxType || "expense",
       amount: amt,
@@ -687,17 +694,6 @@ window.APP_MOBILE = {
     if (!val) return;
     const [code, sym] = val.split("|");
     window.APP_STATE.setCurrency(code, sym);
-  },
-
-  handleRestoreFile(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      window.APP_STATE.restoreBackupData(event.target.result);
-      e.target.value = "";
-    };
-    reader.readAsText(file);
   },
 
   openNewCategorySheet() {

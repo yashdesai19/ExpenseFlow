@@ -15,13 +15,13 @@ class BudgetBase(BaseModel):
         description="Budget ceiling amount for the period",
     )
     month: int = Field(
-        default_factory=lambda: dt.datetime.now().month,
+        default_factory=lambda: dt.date.today().month,
         ge=1,
         le=12,
         description="Month (1-12)",
     )
     year: int = Field(
-        default_factory=lambda: dt.datetime.now().year,
+        default_factory=lambda: dt.date.today().year,
         ge=2000,
         le=2100,
         description="Four-digit year (e.g. 2026)",
@@ -43,6 +43,7 @@ class BudgetResponse(BudgetBase):
     id: int
     user_id: int
     created_at: dt.datetime
+    updated_at: dt.datetime
     category: Optional[CategoryResponse] = None
 
     model_config = ConfigDict(from_attributes=True)

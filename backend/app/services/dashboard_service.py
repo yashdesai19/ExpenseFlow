@@ -25,9 +25,9 @@ class DashboardService:
         month: Optional[int] = None,
         year: Optional[int] = None,
     ) -> DashboardSummaryResponse:
-        now = dt.datetime.now()
-        target_month = month if month is not None else now.month
-        target_year = year if year is not None else now.year
+        today = dt.date.today()
+        target_month = month if month is not None else today.month
+        target_year = year if year is not None else today.year
 
         # 1. Calculate Previous Month & Year for Comparison
         if target_month == 1:

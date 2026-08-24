@@ -6,6 +6,14 @@ from app.core.config import settings
 
 
 # ------------------------------------------------------------------------------
+# Dummy Password Hash for Timing-Safe Validation
+# A pre-computed bcrypt hash used to equalize response times when authenticating
+# non-existent users (prevents timing attacks that could enumerate valid emails).
+# ------------------------------------------------------------------------------
+DUMMY_PASSWORD_HASH = bcrypt.hashpw(b"dummy-password", bcrypt.gensalt(rounds=12)).decode("utf-8")
+
+
+# ------------------------------------------------------------------------------
 # Password Hashing & Verification (Bcrypt)
 # ------------------------------------------------------------------------------
 def get_password_hash(password: str) -> str:

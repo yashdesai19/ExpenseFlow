@@ -41,6 +41,7 @@ class BudgetService:
             month=budget.month,
             year=budget.year,
             created_at=budget.created_at,
+            updated_at=budget.updated_at,
             category=budget.category,  # type: ignore
             spent_amount=spent,
             remaining_amount=remaining,

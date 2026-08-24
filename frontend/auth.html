@@ -360,9 +360,9 @@
 const API_BASE = (() => {
   const h = window.location.hostname;
   const o = window.location.origin;
-  if (o.includes(':3000')) return `http://${h}:8080/api/v1`;
-  if (o.includes(':8080')) return o + '/api/v1';
-  return 'http://127.0.0.1:8080/api/v1';
+  if (o.includes(':3001')) return `http://${h}:8081/api/v1`;
+  if (o.includes(':8081')) return o + '/api/v1';
+  return 'http://127.0.0.1:8081/api/v1';
 })();
 
 const TOKEN_KEY = 'expenseflow_auth_token';

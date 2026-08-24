@@ -36,5 +36,6 @@ class CategoryResponse(CategoryBase):
     user_id: Optional[int]
     is_system: bool
     created_at: datetime
+    updated_at: datetime | None = None
 
     model_config = ConfigDict(from_attributes=True)

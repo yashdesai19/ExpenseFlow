@@ -17,7 +17,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     try {
       const user = await window.APP_API.getMe();
       if (user && user.full_name) {
-        window.APP_STATE.updateProfile(user.full_name, user.business_name || "Enterprise Account", user.email);
+        window.APP_STATE.updateProfile(user.full_name, "Enterprise Account", user.email);
         localStorage.setItem(window.APP_API.USER_KEY, JSON.stringify(user));
       }
     } catch (e) {

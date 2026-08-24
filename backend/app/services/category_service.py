@@ -1,6 +1,6 @@
 from typing import List, Optional
 from fastapi import HTTPException, status
-from sqlalchemy import select, or_, update, delete
+from sqlalchemy import select, or_
 from sqlalchemy.orm import Session
 
 from app.models.user import User
@@ -124,28 +124,12 @@ class CategoryService:
                 detail="System default categories cannot be deleted.",
             )
 
-        # Reassign existing expenses to another available category
-        from app.models.expense import Expense
-        from app.models.budget import Budget
-
-        fallback = db.scalars(
-            select(Category).where(
-                Category.id != category.id,
-                or_(Category.user_id == user.id, Category.is_system.is_(True))
+        # Block deletion if the category is still referenced by expenses or budgets
+        if category_repo.is_in_use(db, category_id=category.id):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Cannot delete a category that is associated with existing expenses or budgets.",
             )
-        ).first()
-
-        if fallback:
-            db.execute(
-                update(Expense)
-                .where(Expense.category_id == category.id)
-                .values(category_id=fallback.id)
-            )
-
-        # Delete budgets for this category
-        db.execute(
-            delete(Budget).where(Budget.category_id == category.id)
-        )
 
         audit = AuditLog(
             user_id=user.id,

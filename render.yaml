@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: expenseflow-backend
+    runtime: python
+    build:
+      buildCommand: pip install -r requirements.txt
+      dockerfilePath: backend/Dockerfile
+    startCommand: alembic upgrade head && gunicorn app.main:app -w 2 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
+    envPath: backend/.env
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: expenseflow-postgres
+          property: connectionString
+      - key: JWT_SECRET_KEY
+        value: prod-jwt-secret-key-change-in-dashboard-32hex
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "False"
+      - key: PYTHONPATH
+        value: backend
+
+  - type: web
+    name: expenseflow-frontend
+    runtime: static
+    build:
+      buildCommand: cp -r frontend/* .
+      publishPath: frontend
+    autoDeploy: true
+
+databases:
+  - name: expenseflow-postgres
+    databaseName: expenseflow_db
+    user: postgres
+    region: oregon

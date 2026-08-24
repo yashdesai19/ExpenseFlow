@@ -5,9 +5,14 @@ window.APP_CONFIG = {
   APP_NAME: "ExpenseFlow Pro",
   APP_EDITION: "The Ledger",
   API_BASE: (() => {
+    // On Render, API is served from same origin
+    if (window.location.hostname && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+      return window.location.origin + "/api/v1";
+    }
+    // Local development
     const host = window.location.hostname || "127.0.0.1";
-    if (window.location.origin.includes(":8080")) return window.location.origin + "/api/v1";
-    return `http://${host}:8080/api/v1`;
+    if (window.location.origin.includes(":8081")) return window.location.origin + "/api/v1";
+    return `http://${host}:8081/api/v1`;
   })(),
   DEFAULT_CURRENCY: "INR",
   DEFAULT_CURRENCY_SYMBOL: "₹",
