@@ -3,8 +3,6 @@ services:
     name: expenseflow-backend
     env: docker
     dockerfilePath: backend/Dockerfile
-    build:
-      context: backend
     autoDeploy: true
     envVars:
       - key: DATABASE_URL
