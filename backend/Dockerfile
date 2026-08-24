@@ -33,9 +33,9 @@ USER appuser
 
 # Health check probe
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:8081/api/v1/health || exit 1
+    CMD curl -f http://localhost:${PORT:-8080}/api/v1/health || exit 1
 
-EXPOSE 8080
+EXPOSE ${PORT:-8080}
 
 # Start server: runs Alembic migrations then launches Uvicorn
-CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8080 --workers 4"]
+CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080} --workers 4"]

@@ -1,12 +1,10 @@
 services:
   - type: web
     name: expenseflow-backend
-    runtime: python
+    runtime: docker
     build:
-      buildCommand: pip install -r requirements.txt
       dockerfilePath: backend/Dockerfile
-    startCommand: alembic upgrade head && gunicorn app.main:app -w 2 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
-    envPath: backend/.env
+      dockerContext: backend
     autoDeploy: true
     envVars:
       - key: DATABASE_URL
@@ -20,7 +18,7 @@ services:
       - key: DEBUG
         value: "False"
       - key: PYTHONPATH
-        value: backend
+        value: /app
 
   - type: web
     name: expenseflow-frontend
