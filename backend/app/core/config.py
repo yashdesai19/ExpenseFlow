@@ -27,8 +27,12 @@ class Settings(BaseSettings):
     def normalize_database_url(cls, v: str) -> str:
         """Convert postgres:// to postgresql:// if needed (SQLAlchemy 2.0 compatibility)."""
         if isinstance(v, str):
-            if v.startswith("postgres://"):
-                return v.replace("postgres://", "postgresql://", 1)
+            url = v.strip()
+            if url.startswith("postgres://"):
+                url = url.replace("postgres://", "postgresql://", 1)
+            if not url:
+                raise ValueError("DATABASE_URL must not be empty")
+            return url
         return v
 
     # --------------------------------------------------------------------------
