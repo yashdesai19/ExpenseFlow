@@ -22,6 +22,15 @@ class Settings(BaseSettings):
     # --------------------------------------------------------------------------
     DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/expenseflow_db"
 
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def normalize_database_url(cls, v: str) -> str:
+        """Convert postgres:// to postgresql:// if needed (SQLAlchemy 2.0 compatibility)."""
+        if isinstance(v, str):
+            if v.startswith("postgres://"):
+                return v.replace("postgres://", "postgresql://", 1)
+        return v
+
     # --------------------------------------------------------------------------
     # Security / JWT
     # --------------------------------------------------------------------------
@@ -60,7 +69,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        case_sensitive=True,
+        case_sensitive=False,
         extra="ignore",
     )
 
