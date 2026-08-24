@@ -17,8 +17,6 @@ services:
         value: production
       - key: DEBUG
         value: "False"
-      - key: PYTHONPATH
-        value: /app
 
   - type: static
     name: expenseflow-frontend
