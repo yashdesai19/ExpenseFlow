@@ -10,8 +10,13 @@ from app.core.config import settings
 # preventing "server closed the connection unexpectedly" errors after idle periods.
 # pool_size=10: Max 10 persistent connections maintained in the pool.
 # max_overflow=20: Max 20 temporary connections when pool is exhausted under load.
+# Validate that DATABASE_URL is properly set
+db_url = settings.DATABASE_URL
+if not db_url or not db_url.strip():
+    raise RuntimeError("DATABASE_URL environment variable is not set or empty!")
+print(f"[DB] Database URL configured: {db_url[:20]}...")
 engine = create_engine(
-    settings.DATABASE_URL,
+    db_url,
     pool_pre_ping=True,
     pool_size=10,
     max_overflow=20,
