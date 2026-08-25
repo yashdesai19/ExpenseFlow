@@ -3,11 +3,15 @@
   "version": "1.0.0",
   "description": "ExpenseFlow Pro Mobile Client",
   "scripts": {
+    "dev": "live-server frontend --port=5500",
     "cap:sync": "cap sync"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",
     "@capacitor/cli": "^8.5.0",
     "@capacitor/core": "^8.5.0"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
   }
 }
