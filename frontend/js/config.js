@@ -6,26 +6,18 @@ window.APP_CONFIG = {
   APP_EDITION: "The Ledger",
   API_BASE: (() => {
     const hostname = window.location.hostname || "";
+    const port = window.location.port || "";
     
-    // If running inside a native mobile app shell (Capacitor)
-    if (window.Capacitor || (hostname === "localhost" && !window.location.port)) {
+    // If there is no port (empty), it means we are in production
+    // (either on the Render website itself, or inside the native mobile app webview)
+    if (!port) {
       return "https://expenseflow-1add.onrender.com/api/v1";
     }
     
-    // Local development
-    if (!hostname || hostname === "localhost" || hostname === "127.0.0.1") {
-      const host = hostname || "127.0.0.1";
-      if (window.location.origin.includes(":8081")) return window.location.origin + "/api/v1";
-      return `http://${host}:8081/api/v1`;
-    }
-    
-    // If hosted on a separate static frontend site on Render, point to the deployed backend URL
-    if (hostname.includes("frontend") || hostname.includes("static") || hostname.includes("1add") === false) {
-      return "https://expenseflow-1add.onrender.com/api/v1";
-    }
-    
-    // Served from the backend origin itself (e.g. via /ui mount)
-    return window.location.origin + "/api/v1";
+    // Local development (running on a specific port like :8081, :5500, etc.)
+    const host = hostname || "127.0.0.1";
+    if (window.location.origin.includes(":8081")) return window.location.origin + "/api/v1";
+    return `http://${host}:8081/api/v1`;
   })(),
   DEFAULT_CURRENCY: "INR",
   DEFAULT_CURRENCY_SYMBOL: "₹",
