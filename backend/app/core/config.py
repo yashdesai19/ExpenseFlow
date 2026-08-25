@@ -64,6 +64,8 @@ class Settings(BaseSettings):
         "http://127.0.0.1:8081",
         "http://127.0.0.1:3000",
         "https://*.onrender.com",
+        "http://localhost",
+        "capacitor://localhost",
     ]
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
