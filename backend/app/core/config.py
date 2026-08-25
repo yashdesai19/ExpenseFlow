@@ -65,6 +65,7 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3000",
         "https://*.onrender.com",
         "http://localhost",
+        "https://localhost",
         "capacitor://localhost",
     ]
 
@@ -84,7 +85,7 @@ class Settings(BaseSettings):
             origins = v
 
         # Always ensure mobile app origins are allowed in any environment config
-        for mobile_origin in ["http://localhost", "capacitor://localhost"]:
+        for mobile_origin in ["http://localhost", "https://localhost", "capacitor://localhost"]:
             if mobile_origin not in origins:
                 origins.append(mobile_origin)
 
