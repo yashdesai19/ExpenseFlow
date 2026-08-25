@@ -39,3 +39,27 @@ def test_registered_models_in_metadata():
         "user_settings",
     }
     assert expected_tables.issubset(table_names)
+
+
+def test_production_database_url_validation():
+    """Verify that settings validation raises ValueError if database URL points to localhost in production."""
+    from pydantic import ValidationError
+    from app.core.config import Settings
+
+    # Case 1: production and localhost should raise ValidationError
+    with pytest.raises(ValidationError) as excinfo:
+        Settings(ENVIRONMENT="production", DATABASE_URL="postgresql://postgres:postgres@localhost:5432/db")
+    assert "DATABASE_URL cannot point to localhost in a production environment" in str(excinfo.value)
+
+    # Case 2: production and 127.0.0.1 should raise ValidationError
+    with pytest.raises(ValidationError):
+        Settings(ENVIRONMENT="production", DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:5432/db")
+
+    # Case 3: production and ::1 should raise ValidationError
+    with pytest.raises(ValidationError):
+        Settings(ENVIRONMENT="production", DATABASE_URL="postgresql://postgres:postgres@[::1]:5432/db")
+
+    # Case 4: production and non-localhost (Render DB URL) should be valid
+    prod_url = "postgresql://user:pass@dpg-xxx-a.oregon-postgres.render.com/db"
+    settings = Settings(ENVIRONMENT="production", DATABASE_URL=prod_url)
+    assert settings.DATABASE_URL == prod_url

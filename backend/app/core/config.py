@@ -1,6 +1,6 @@
 import json
 from typing import List, Union
-from pydantic import field_validator
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -34,6 +34,16 @@ class Settings(BaseSettings):
                 raise ValueError("DATABASE_URL must not be empty")
             return url
         return v
+
+    @model_validator(mode="after")
+    def validate_production_database_url(self) -> "Settings":
+        if self.ENVIRONMENT.lower() == "production":
+            if "localhost" in self.DATABASE_URL or "127.0.0.1" in self.DATABASE_URL or "::1" in self.DATABASE_URL:
+                raise ValueError(
+                    "DATABASE_URL cannot point to localhost in a production environment! "
+                    "Please ensure the DATABASE_URL environment variable is correctly set in Render."
+                )
+        return self
 
     # --------------------------------------------------------------------------
     # Security / JWT
