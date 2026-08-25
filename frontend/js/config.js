@@ -7,6 +7,11 @@ window.APP_CONFIG = {
   API_BASE: (() => {
     const hostname = window.location.hostname || "";
     
+    // If running inside a native mobile app shell (Capacitor)
+    if (window.Capacitor || (hostname === "localhost" && !window.location.port)) {
+      return "https://expenseflow-1add.onrender.com/api/v1";
+    }
+    
     // Local development
     if (!hostname || hostname === "localhost" || hostname === "127.0.0.1") {
       const host = hostname || "127.0.0.1";

@@ -263,6 +263,11 @@ const API_BASE = (() => {
   const h = window.location.hostname;
   const o = window.location.origin;
   
+  // If running inside a native mobile app shell (Capacitor)
+  if (window.Capacitor || (h === 'localhost' && !window.location.port)) {
+    return 'https://expenseflow-1add.onrender.com/api/v1';
+  }
+  
   // If running on local development (non-production ports/localhost)
   if (!h || h === 'localhost' || h === '127.0.0.1') {
     if (o.includes(':3001')) return `http://${h}:8081/api/v1`;
