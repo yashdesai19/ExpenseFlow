@@ -5,14 +5,22 @@ window.APP_CONFIG = {
   APP_NAME: "ExpenseFlow Pro",
   APP_EDITION: "The Ledger",
   API_BASE: (() => {
-    // On Render, API is served from same origin
-    if (window.location.hostname && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
-      return window.location.origin + "/api/v1";
-    }
+    const hostname = window.location.hostname || "";
+    
     // Local development
-    const host = window.location.hostname || "127.0.0.1";
-    if (window.location.origin.includes(":8081")) return window.location.origin + "/api/v1";
-    return `http://${host}:8081/api/v1`;
+    if (!hostname || hostname === "localhost" || hostname === "127.0.0.1") {
+      const host = hostname || "127.0.0.1";
+      if (window.location.origin.includes(":8081")) return window.location.origin + "/api/v1";
+      return `http://${host}:8081/api/v1`;
+    }
+    
+    // If hosted on a separate static frontend site on Render, point to the deployed backend URL
+    if (hostname.includes("frontend") || hostname.includes("static") || hostname.includes("1add") === false) {
+      return "https://expenseflow-1add.onrender.com/api/v1";
+    }
+    
+    // Served from the backend origin itself (e.g. via /ui mount)
+    return window.location.origin + "/api/v1";
   })(),
   DEFAULT_CURRENCY: "INR",
   DEFAULT_CURRENCY_SYMBOL: "₹",
