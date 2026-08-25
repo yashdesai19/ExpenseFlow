@@ -71,16 +71,24 @@ class Settings(BaseSettings):
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     @classmethod
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
+        origins = []
         if isinstance(v, str):
             if v.startswith("[") and v.endswith("]"):
                 try:
-                    return json.loads(v)
+                    origins = json.loads(v)
                 except Exception:
                     pass
-            return [i.strip() for i in v.split(",") if i.strip()]
+            else:
+                origins = [i.strip() for i in v.split(",") if i.strip()]
         elif isinstance(v, list):
-            return v
-        return []
+            origins = v
+
+        # Always ensure mobile app origins are allowed in any environment config
+        for mobile_origin in ["http://localhost", "capacitor://localhost"]:
+            if mobile_origin not in origins:
+                origins.append(mobile_origin)
+
+        return origins
 
     model_config = SettingsConfigDict(
         env_file=".env",
