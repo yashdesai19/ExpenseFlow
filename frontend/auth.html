@@ -13,6 +13,8 @@
 
 <!-- Shared Design Tokens -->
 <link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
 
 <style>
 /* ============================================================
@@ -21,69 +23,8 @@
 .auth-page {
   min-height: 100dvh;
   display: grid;
-  grid-template-columns: 1fr 480px;
+  grid-template-columns: 1fr;
   background: var(--bg);
-}
-
-/* --- Hero --- */
-.auth-hero {
-  background: linear-gradient(145deg, #1A160F 0%, #2C2416 60%, #3A2E1A 100%);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 48px;
-  position: relative;
-  overflow: hidden;
-}
-[data-theme="dark"] .auth-hero {
-  background: linear-gradient(145deg, #05060A 0%, #0E1017 60%, #131720 100%);
-}
-.auth-hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 60% 50% at 30% 40%, rgba(169,121,63,0.18) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 60% at 80% 70%, rgba(169,121,63,0.08) 0%, transparent 60%);
-}
-.hero-brand { display:flex; align-items:center; gap:14px; position:relative; z-index:1; }
-.hero-icon {
-  width:44px; height:44px;
-  background: linear-gradient(135deg, #C9A467, #A9793F);
-  border-radius:12px;
-  display:flex; align-items:center; justify-content:center;
-  font-family:var(--font-serif); font-size:18px; font-weight:700;
-  color:#1A160F; flex-shrink:0;
-  box-shadow: 0 4px 16px rgba(169,121,63,0.4);
-}
-.hero-brand-name { font-family:var(--font-serif); font-size:20px; font-weight:700; color:#F5F2E9; }
-.hero-brand-sub  { font-size:12px; color:rgba(245,242,233,0.45); margin-top:2px; }
-
-.hero-content { position:relative; z-index:1; }
-.hero-tagline {
-  font-family:var(--font-serif);
-  font-size: clamp(32px, 4vw, 52px);
-  font-weight:700; color:#F5F2E9;
-  line-height:1.15; letter-spacing:-0.02em;
-  margin-bottom:20px;
-}
-.hero-tagline span { color:#C9A467; }
-.hero-desc { font-size:16px; color:rgba(245,242,233,0.55); line-height:1.7; max-width:400px; margin-bottom:40px; }
-
-.hero-stats { display:flex; gap:32px; }
-.hero-stat  { display:flex; flex-direction:column; gap:4px; }
-.hero-stat-num   { font-family:var(--font-mono); font-size:22px; font-weight:500; color:#C9A467; }
-.hero-stat-label { font-size:12px; color:rgba(245,242,233,0.4); text-transform:uppercase; letter-spacing:0.06em; }
-.hero-footer     { font-size:12px; color:rgba(245,242,233,0.3); position:relative; z-index:1; }
-
-/* --- Auth Panel --- */
-.auth-panel {
-  background: var(--bg-elevated);
-  display:flex; flex-direction:column; justify-content:center;
-  padding:48px 40px;
-  border-left:1px solid var(--border);
-  overflow-y:auto;
-  position:relative;
 }
 
 .theme-toggle-auth {
@@ -93,6 +34,7 @@
   background:var(--bg); cursor:pointer;
   font-size:16px; display:flex; align-items:center; justify-content:center;
   transition:all 150ms ease; color:var(--text-muted);
+  z-index: 10;
 }
 .theme-toggle-auth:hover { background:var(--accent-soft); color:var(--accent); border-color:var(--accent); }
 
@@ -205,62 +147,23 @@
 /* Helpers */
 .d-none { display:none !important; }
 
-/* Mobile */
-@media (max-width: 800px) {
-  .auth-page { grid-template-columns: 1fr; }
-  .auth-hero  { display:none; }
-  .auth-panel {
-    padding:40px 24px 60px; border-left:none;
-    min-height:100dvh; justify-content:flex-start; padding-top:64px;
-  }
-  .mobile-brand { display:flex !important; }
-}
 .mobile-brand {
-  display:none; align-items:center; gap:12px; margin-bottom:28px;
+  display:flex; align-items:center; gap:12px; margin-bottom:28px;
+}
+.hero-icon {
+  width:44px; height:44px;
+  background: linear-gradient(135deg, #C9A467, #A9793F);
+  border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-serif); font-size:18px; font-weight:700;
+  color:#1A160F; flex-shrink:0;
+  box-shadow: 0 4px 16px rgba(169,121,63,0.4);
 }
 </style>
 </head>
 
-<body>
-<div class="auth-page">
-
-  <!-- ===================== HERO ===================== -->
-  <div class="auth-hero">
-    <div class="hero-brand">
-      <div class="hero-icon">EF</div>
-      <div>
-        <div class="hero-brand-name">ExpenseFlow Pro</div>
-        <div class="hero-brand-sub">The Ledger Workspace</div>
-      </div>
-    </div>
-
-    <div class="hero-content">
-      <h1 class="hero-tagline">Your finances,<br><span>finally clear.</span></h1>
-      <p class="hero-desc">
-        Track every rupee, set smart budgets, and understand your cash flow &mdash;
-        all in one beautifully designed workspace.
-      </p>
-      <div class="hero-stats">
-        <div class="hero-stat">
-          <span class="hero-stat-num">&#8377;0</span>
-          <span class="hero-stat-label">Hidden Fees</span>
-        </div>
-        <div class="hero-stat">
-          <span class="hero-stat-num">100%</span>
-          <span class="hero-stat-label">Private &amp; Secure</span>
-        </div>
-        <div class="hero-stat">
-          <span class="hero-stat-num">JWT</span>
-          <span class="hero-stat-label">Auth Standard</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="hero-footer">&copy; 2026 ExpenseFlow Pro &mdash; Production-grade Expense Management</div>
-  </div>
-
-  <!-- ===================== AUTH PANEL ===================== -->
-  <div class="auth-panel">
+<body class="mobile-center-frame">
+  <div class="ledger-shell" style="padding: 40px 24px 60px; overflow-y: auto; justify-content: flex-start; display: flex; flex-direction: column;">
 
     <button class="theme-toggle-auth" id="authThemeToggle" onclick="toggleTheme()" title="Toggle theme">&#127769;</button>
 
@@ -349,7 +252,6 @@
     </div>
 
   </div>
-</div>
 
 <script>
 /* ============================================================
