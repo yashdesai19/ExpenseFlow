@@ -236,11 +236,11 @@ window.APP_STATE = {
   },
 
   async deleteCategory(id) {
-    this.data.categories = this.data.categories.filter(c => c.id !== id && String(c.id) !== String(id));
+    this.data.categories = this.data.categories.filter(c => String(c.id) !== String(id));
     this.notify();
     window.APP_UTILS.showToast("Category removed");
 
-    if (window.APP_API && window.APP_API.isAuthenticated() && (typeof id === "number" || !isNaN(id))) {
+    if (window.APP_API && window.APP_API.isAuthenticated()) {
       try {
         await window.APP_API.deleteCategory(id);
       } catch (e) {
@@ -250,7 +250,7 @@ window.APP_STATE = {
   },
 
   setCategoryBudget(categoryId, limit) {
-    const cat = this.data.categories.find(c => c.id === categoryId);
+    const cat = this.data.categories.find(c => String(c.id) === String(categoryId));
     if (cat) {
       cat.budget = limit;
       this.notify();

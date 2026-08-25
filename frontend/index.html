@@ -346,10 +346,86 @@
       </div>
     </div>
 
+    <!-- ====================================================================
+         VIEW 5: GROUPS (SPLITWISE-STYLE)
+         ==================================================================== -->
+    <div id="lView-groups" style="display:none; flex-direction:column; gap:0;">
+
+      <!-- Sub-view: Groups List -->
+      <div id="lGrpSubview-list" style="display:flex; flex-direction:column; gap:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="font-size:13px; font-weight:700;">Your Groups</div>
+          <button class="btn-brass-primary" style="padding:5px 12px; font-size:12px;" onclick="window.APP_GROUPS.openCreateGroupSheet()">+ New Group</button>
+        </div>
+
+        <!-- Net Balance Summary Card -->
+        <div class="l-card" id="lGrpNetSummaryCard" style="background:var(--card-alt); border-color:var(--border-strong); display:flex; gap:18px; align-items:center; padding:14px 16px;">
+          <div style="flex:1; text-align:center;">
+            <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--success);">You Are Owed</div>
+            <div class="money" id="lGrpTotalOwed" style="font-size:17px; font-weight:700; color:var(--success); margin-top:3px;">₹0</div>
+          </div>
+          <div style="width:1px; height:32px; background:var(--border);"></div>
+          <div style="flex:1; text-align:center;">
+            <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--danger);">You Owe</div>
+            <div class="money" id="lGrpTotalOwe" style="font-size:17px; font-weight:700; color:var(--danger); margin-top:3px;">₹0</div>
+          </div>
+        </div>
+
+        <!-- Groups List -->
+        <div id="lGroupsList" style="display:flex; flex-direction:column; gap:10px;">
+          <div style="text-align:center; padding:32px 0; color:var(--text-muted); font-size:13px;">Loading groups…</div>
+        </div>
+      </div>
+
+      <!-- Sub-view: Group Detail -->
+      <div id="lGrpSubview-detail" style="display:none; flex-direction:column; gap:0;">
+
+        <!-- Sticky Group Header -->
+        <div style="display:flex; align-items:center; gap:12px; padding-bottom:14px; border-bottom:1px solid var(--border); margin-bottom:14px;">
+          <button onclick="window.APP_GROUPS.goToGroupsList()" style="background:none; border:none; font-size:20px; color:var(--text-muted); cursor:pointer; padding:0;">‹</button>
+          <div id="lGrpDetailIcon" style="width:44px; height:44px; border-radius:14px; background:linear-gradient(135deg, var(--accent), var(--accent-bright)); display:flex; align-items:center; justify-content:center; font-size:20px;">🤝</div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-family:var(--font-serif); font-size:18px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="lGrpDetailName">Group Name</div>
+            <div style="font-size:11px; color:var(--text-muted);" id="lGrpDetailMemberCount">0 members</div>
+          </div>
+          <button class="btn-brass-icon" style="width:34px; height:34px; font-size:14px;" onclick="window.APP_GROUPS.openGroupSettings()" title="Group Settings">⚙️</button>
+        </div>
+
+        <!-- Your balance in group -->
+        <div class="l-card" id="lGrpMyBalCard" style="margin-bottom:14px; padding:14px 16px; text-align:center; background:var(--card-alt);"></div>
+
+        <!-- Tab pills: Activity | Balances | Members -->
+        <div class="l-segmented" style="margin-bottom:14px;">
+          <button class="l-seg-btn active" id="lGrpTab-activity" onclick="window.APP_GROUPS.switchDetailTab('activity')">Activity</button>
+          <button class="l-seg-btn" id="lGrpTab-balances" onclick="window.APP_GROUPS.switchDetailTab('balances')">Balances</button>
+          <button class="l-seg-btn" id="lGrpTab-members" onclick="window.APP_GROUPS.switchDetailTab('members')">Members</button>
+        </div>
+
+        <!-- Activity Feed -->
+        <div id="lGrpActivity" style="display:flex; flex-direction:column; gap:8px;">
+          <div style="text-align:center; padding:20px 0; color:var(--text-muted); font-size:13px;">Loading activity…</div>
+        </div>
+
+        <!-- Balances Tab -->
+        <div id="lGrpBalances" style="display:none; flex-direction:column; gap:10px;">
+          <div style="text-align:center; padding:20px 0; color:var(--text-muted); font-size:13px;">Loading balances…</div>
+        </div>
+
+        <!-- Members Tab -->
+        <div id="lGrpMembers" style="display:none; flex-direction:column; gap:8px;"></div>
+
+        <!-- Action Buttons -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px; padding-top:14px; border-top:1px solid var(--border);">
+          <button class="btn-brass-primary" style="justify-content:center; font-size:13px;" onclick="window.APP_GROUPS.openAddGroupExpenseSheet()">+ Add Expense</button>
+          <button class="btn-brass-secondary" style="justify-content:center; font-size:13px;" onclick="window.APP_GROUPS.openSettleUpSheet()">💸 Settle Up</button>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- Permanently Docked Bottom Navigation Bar -->
-  <nav class="ledger-fixed-bottom-bar">
+  <nav class="ledger-fixed-bottom-bar" style="padding:6px 8px calc(6px + var(--safe-bottom));">
     <button class="nav-tab-brass active" id="lTabBtn-home" onclick="window.APP_MOBILE.showTab('home')">
       <span>🏛️</span>
       <span>Home</span>
@@ -360,15 +436,15 @@
     </button>
 
     <!-- Floating Brass Action Button -->
-    <button class="brass-fab" onclick="window.APP_MOBILE.openAddSheet('expense')" title="New Entry">+</button>
+    <button class="brass-fab" onclick="window.APP_MOBILE.openFAB()" title="New Entry">+</button>
 
+    <button class="nav-tab-brass" id="lTabBtn-groups" onclick="window.APP_MOBILE.showTab('groups')">
+      <span>🤝</span>
+      <span>Groups</span>
+    </button>
     <button class="nav-tab-brass" id="lTabBtn-insights" onclick="window.APP_MOBILE.showTab('insights')">
       <span>📊</span>
       <span>Insights</span>
-    </button>
-    <button class="nav-tab-brass" id="lTabBtn-profile" onclick="window.APP_MOBILE.showTab('profile')">
-      <span>👤</span>
-      <span>Profile</span>
     </button>
   </nav>
 
@@ -530,6 +606,170 @@
   </div>
 </div>
 
+<!-- 6. Create Group Sheet -->
+<div class="sheet-overlay" id="lCreateGroupOverlay" onclick="if(event.target.id==='lCreateGroupOverlay') window.APP_GROUPS.closeGroupSheet('lCreateGroupOverlay')">
+  <div class="bottom-sheet-panel">
+    <div class="sheet-handle"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="font-family:var(--font-serif); font-size:19px; font-weight:600;">New Group</h3>
+      <button onclick="window.APP_GROUPS.closeGroupSheet('lCreateGroupOverlay')" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
+    </div>
+    <div>
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Group Name*</label>
+      <input class="l-input" id="lGrpNameInput" placeholder="e.g. Goa Trip, Roommates">
+    </div>
+    <div>
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:6px;">Group Icon</label>
+      <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;" id="lGrpIconPicker">
+        <button type="button" class="btn-brass-icon" onclick="window.APP_GROUPS.selectGrpIcon('🏖️')">🏖️</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_GROUPS.selectGrpIcon('🏠')">🏠</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_GROUPS.selectGrpIcon('👨‍👩‍👧‍👦')">👨‍👩‍👧‍👦</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_GROUPS.selectGrpIcon('✈️')">✈️</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_GROUPS.selectGrpIcon('🍕')">🍕</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_GROUPS.selectGrpIcon('💼')">💼</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_GROUPS.selectGrpIcon('🎉')">🎉</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_GROUPS.selectGrpIcon('🤝')">🤝</button>
+      </div>
+      <input class="l-input" id="lGrpIconInput" placeholder="Emoji icon" value="🤝" style="font-size:18px; text-align:center; width:80px;">
+    </div>
+    <button class="btn-brass-primary" onclick="window.APP_GROUPS.createGroup()" style="width:100%; padding:13px; font-size:15px; margin-top:6px; justify-content:center;">Create Group</button>
+  </div>
+</div>
+
+<!-- 7. Add Group Member Sheet -->
+<div class="sheet-overlay" id="lAddMemberOverlay" onclick="if(event.target.id==='lAddMemberOverlay') window.APP_GROUPS.closeGroupSheet('lAddMemberOverlay')">
+  <div class="bottom-sheet-panel">
+    <div class="sheet-handle"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="font-family:var(--font-serif); font-size:19px; font-weight:600;">Add Member</h3>
+      <button onclick="window.APP_GROUPS.closeGroupSheet('lAddMemberOverlay')" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
+    </div>
+    <div>
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Member Email*</label>
+      <input class="l-input" id="lAddMemberEmail" type="email" placeholder="friend@example.com">
+    </div>
+    <button class="btn-brass-primary" onclick="window.APP_GROUPS.addMember()" style="width:100%; padding:13px; font-size:15px; margin-top:6px; justify-content:center;">Add to Group</button>
+  </div>
+</div>
+
+<!-- 8. Add Group Expense Sheet -->
+<div class="sheet-overlay" id="lAddGroupExpenseOverlay" onclick="if(event.target.id==='lAddGroupExpenseOverlay') window.APP_GROUPS.closeGroupSheet('lAddGroupExpenseOverlay')">
+  <div class="bottom-sheet-panel" style="max-height:92vh; overflow-y:auto;">
+    <div class="sheet-handle"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="font-family:var(--font-serif); font-size:19px; font-weight:600;">Add Group Expense</h3>
+      <button onclick="window.APP_GROUPS.closeGroupSheet('lAddGroupExpenseOverlay')" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
+    </div>
+
+    <div style="display:flex; align-items:baseline; gap:6px; border-bottom:1px solid var(--border); padding:10px 0;">
+      <span style="font-family:var(--font-serif); font-size:26px; color:var(--text-muted);">₹</span>
+      <input class="money" id="lGrpExpAmt" type="number" step="0.01" placeholder="0" style="border:none; outline:none; background:transparent; font-family:var(--font-serif); font-size:32px; color:var(--text); width:100%;">
+    </div>
+
+    <div>
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Description*</label>
+      <input class="l-input" id="lGrpExpDesc" placeholder="e.g. Hotel, Dinner, Taxi">
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <div>
+        <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Category</label>
+        <select class="l-input" id="lGrpExpCategory" style="font-size:12.5px;"></select>
+      </div>
+      <div>
+        <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Date</label>
+        <input class="l-input" type="date" id="lGrpExpDate">
+      </div>
+    </div>
+
+    <div>
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Paid By</label>
+      <select class="l-input" id="lGrpExpPaidBy" style="font-size:12.5px;"></select>
+    </div>
+
+    <div>
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Split Method</label>
+      <div class="l-segmented">
+        <button class="l-seg-btn active" id="lGrpSplitBtn-equal" onclick="window.APP_GROUPS.setSplitMethod('equal')">Equal</button>
+        <button class="l-seg-btn" id="lGrpSplitBtn-exact" onclick="window.APP_GROUPS.setSplitMethod('exact')">Exact</button>
+        <button class="l-seg-btn" id="lGrpSplitBtn-percentage" onclick="window.APP_GROUPS.setSplitMethod('percentage')">%</button>
+      </div>
+    </div>
+
+    <div>
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:6px;">Split Among</label>
+      <div id="lGrpParticipantsContainer" style="display:flex; flex-direction:column; gap:6px;"></div>
+    </div>
+
+    <button class="btn-brass-primary" onclick="window.APP_GROUPS.saveGroupExpense()" style="width:100%; padding:13px; font-size:15px; margin-top:6px; justify-content:center;">Add to Group</button>
+  </div>
+</div>
+
+<!-- 9. Settle Up Sheet -->
+<div class="sheet-overlay" id="lSettleUpOverlay" onclick="if(event.target.id==='lSettleUpOverlay') window.APP_GROUPS.closeGroupSheet('lSettleUpOverlay')">
+  <div class="bottom-sheet-panel">
+    <div class="sheet-handle"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="font-family:var(--font-serif); font-size:19px; font-weight:600;">Settle Up</h3>
+      <button onclick="window.APP_GROUPS.closeGroupSheet('lSettleUpOverlay')" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
+    </div>
+
+    <!-- Suggested settlements list -->
+    <div id="lSettleSuggestions" style="display:flex; flex-direction:column; gap:8px; margin-bottom:8px;"></div>
+
+    <div style="border-top:1px solid var(--border); padding-top:12px;">
+      <div style="font-size:12px; font-weight:700; color:var(--text-sec); margin-bottom:8px;">RECORD CUSTOM PAYMENT</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div>
+          <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">From (Payer)</label>
+          <select class="l-input" id="lSettlePayerSelect" style="font-size:12px;"></select>
+        </div>
+        <div>
+          <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">To (Receiver)</label>
+          <select class="l-input" id="lSettleReceiverSelect" style="font-size:12px;"></select>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div>
+          <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Amount (₹)</label>
+          <input class="l-input" type="number" step="0.01" id="lSettleAmountInput" placeholder="0.00">
+        </div>
+        <div>
+          <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Date</label>
+          <input class="l-input" type="date" id="lSettleDateInput">
+        </div>
+      </div>
+      <div>
+        <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Notes (optional)</label>
+        <input class="l-input" id="lSettleNotesInput" placeholder="e.g. UPI transfer">
+      </div>
+      <button class="btn-brass-primary" onclick="window.APP_GROUPS.recordSettlement()" style="width:100%; padding:13px; font-size:15px; margin-top:6px; justify-content:center;">Record Payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- 10. Group Settings Sheet -->
+<div class="sheet-overlay" id="lGroupSettingsOverlay" onclick="if(event.target.id==='lGroupSettingsOverlay') window.APP_GROUPS.closeGroupSheet('lGroupSettingsOverlay')">
+  <div class="bottom-sheet-panel">
+    <div class="sheet-handle"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="font-family:var(--font-serif); font-size:19px; font-weight:600;">Group Settings</h3>
+      <button onclick="window.APP_GROUPS.closeGroupSheet('lGroupSettingsOverlay')" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
+    </div>
+    <div>
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Group Name</label>
+      <input class="l-input" id="lGrpEditName" placeholder="Group name">
+    </div>
+    <div>
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Group Icon</label>
+      <input class="l-input" id="lGrpEditIcon" placeholder="Emoji" style="font-size:18px; text-align:center; width:80px;">
+    </div>
+    <button class="btn-brass-primary" onclick="window.APP_GROUPS.saveGroupSettings()" style="width:100%; padding:12px; font-size:14px; justify-content:center;">Save Changes</button>
+    <button onclick="window.APP_GROUPS.openAddMemberSheet()" style="width:100%; padding:12px; font-size:13px; background:none; border:1px solid var(--border); border-radius:12px; color:var(--text); cursor:pointer; margin-top:2px;">+ Add Member</button>
+    <button onclick="window.APP_GROUPS.confirmDeleteGroup()" style="width:100%; padding:12px; font-size:13px; background:var(--danger-soft); border:none; border-radius:12px; color:var(--danger); cursor:pointer; margin-top:2px;">🗑 Delete Group</button>
+  </div>
+</div>
+
 </div><!-- End of ledger-shell -->
 
 <div class="l-toast" id="lToast">Entry saved</div>
@@ -541,6 +781,7 @@
 <script src="js/state.js"></script>
 <script src="js/desktop.js"></script>
 <script src="js/mobile.js"></script>
+<script src="js/groups.js"></script>
 <script src="js/app.js"></script>
 
 </body>

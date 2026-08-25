@@ -10,6 +10,7 @@ from app.routers import (
     recurring,
     audit,
     settings,
+    groups,
 )
 
 api_router = APIRouter()
@@ -25,3 +26,4 @@ api_router.include_router(reports.router)
 api_router.include_router(recurring.router)
 api_router.include_router(audit.router)
 api_router.include_router(settings.router)
+api_router.include_router(groups.router)

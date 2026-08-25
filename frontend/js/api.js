@@ -143,5 +143,87 @@ window.APP_API = {
 
   async getBudgets() {
     return await this.request("/budgets");
+  },
+
+  // --- Group APIs ---
+  async getGroups() {
+    return await this.request("/groups");
+  },
+
+  async createGroup(payload) {
+    return await this.request("/groups", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+  },
+
+  async getGroup(id) {
+    return await this.request(`/groups/${id}`);
+  },
+
+  async updateGroup(id, payload) {
+    return await this.request(`/groups/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload)
+    });
+  },
+
+  async deleteGroup(id) {
+    return await this.request(`/groups/${id}`, {
+      method: "DELETE"
+    });
+  },
+
+  async addGroupMember(groupId, email) {
+    return await this.request(`/groups/${groupId}/members`, {
+      method: "POST",
+      body: JSON.stringify({ email })
+    });
+  },
+
+  async removeGroupMember(groupId, userId) {
+    return await this.request(`/groups/${groupId}/members/${userId}`, {
+      method: "DELETE"
+    });
+  },
+
+  // --- Group Expense APIs ---
+  async getGroupExpenses(groupId, page = 1, limit = 50) {
+    return await this.request(`/groups/${groupId}/expenses?page=${page}&limit=${limit}`);
+  },
+
+  async createGroupExpense(groupId, payload) {
+    return await this.request(`/groups/${groupId}/expenses`, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+  },
+
+  async deleteGroupExpense(groupId, expenseId) {
+    return await this.request(`/groups/${groupId}/expenses/${expenseId}`, {
+      method: "DELETE"
+    });
+  },
+
+  // --- Group Balance & Settlement APIs ---
+  async getGroupBalances(groupId) {
+    return await this.request(`/groups/${groupId}/balances`);
+  },
+
+  async getGroupSettlements(groupId) {
+    return await this.request(`/groups/${groupId}/settlements`);
+  },
+
+  async createGroupSettlement(groupId, payload) {
+    return await this.request(`/groups/${groupId}/settlements`, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+  },
+
+  async deleteGroupSettlement(groupId, settlementId) {
+    return await this.request(`/groups/${groupId}/settlements/${settlementId}`, {
+      method: "DELETE"
+    });
   }
 };

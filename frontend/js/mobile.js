@@ -74,19 +74,37 @@ window.APP_MOBILE = {
 
   showTab(tabKey) {
     this.activeTab = tabKey;
-    ["home", "transactions", "insights", "profile"].forEach(k => {
+    ["home", "transactions", "insights", "groups", "profile"].forEach(k => {
       const view = document.getElementById(`lView-${k}`);
       if (view) view.style.display = k === tabKey ? "flex" : "none";
       const btn = document.getElementById(`lTabBtn-${k}`);
       if (btn) btn.classList.toggle("active", k === tabKey);
     });
 
-    const titles = { home: "Ledger", transactions: "Transactions", insights: "Insights", profile: "Profile" };
+    const titles = { home: "Ledger", transactions: "Transactions", insights: "Insights", groups: "Groups", profile: "Profile" };
     const titleEl = document.getElementById("lHeaderTitle");
     if (titleEl) titleEl.textContent = titles[tabKey] || "Ledger";
 
     const body = document.getElementById("lScrollBody");
     if (body) body.scrollTo({ top: 0, behavior: "smooth" });
+
+    // Load groups data when switching to groups tab
+    if (tabKey === "groups" && window.APP_GROUPS) {
+      window.APP_GROUPS.loadGroupsList();
+    }
+  },
+
+  openFAB() {
+    if (this.activeTab === "groups") {
+      // If inside a group detail, open group expense sheet
+      if (window.APP_GROUPS && window.APP_GROUPS.currentGroupId) {
+        window.APP_GROUPS.openAddGroupExpenseSheet();
+      } else {
+        window.APP_GROUPS && window.APP_GROUPS.openCreateGroupSheet();
+      }
+    } else {
+      this.openAddSheet("expense");
+    }
   },
 
   render() {
@@ -495,7 +513,7 @@ window.APP_MOBILE = {
     if (!grid) return;
     const state = window.APP_STATE.data;
     grid.innerHTML = state.categories.map(c => `
-      <button class="cat-picker-btn ${c.id === this.selectedCatId ? "active" : ""}" type="button" onclick="window.APP_MOBILE.selectCategory('${c.id}')">
+      <button class="cat-picker-btn ${String(c.id) === String(this.selectedCatId) ? "active" : ""}" type="button" onclick="window.APP_MOBILE.selectCategory('${c.id}')">
         <span style="font-size:18px;">${c.icon}</span>
         <span style="font-size:10.5px; color:var(--text-sec); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%; text-align:center;">${c.name}</span>
       </button>
@@ -513,7 +531,7 @@ window.APP_MOBILE = {
   },
 
   selectCategory(id) {
-    this.selectedCatId = id;
+    this.selectedCatId = String(id);
     this.populateAddSheetCategories();
   },
 
@@ -748,10 +766,10 @@ window.APP_MOBILE = {
 
   deleteCategoryConfirm(categoryId) {
     const state = window.APP_STATE.data;
-    const cat = state.categories.find(c => c.id === categoryId);
+    const cat = state.categories.find(c => String(c.id) === String(categoryId));
     if (!cat) return;
     if (confirm(`Are you sure you want to delete category "${cat.name}"?`)) {
-      window.APP_STATE.deleteCategory(categoryId);
+      window.APP_STATE.deleteCategory(String(cat.id));
       this.render();
     }
   },

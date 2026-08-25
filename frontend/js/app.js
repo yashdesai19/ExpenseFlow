@@ -18,6 +18,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       const user = await window.APP_API.getMe();
       if (user && user.full_name) {
         window.APP_STATE.updateProfile(user.full_name, "Enterprise Account", user.email);
+        window.APP_STATE.data.userId = user.id;
         localStorage.setItem(window.APP_API.USER_KEY, JSON.stringify(user));
       }
     } catch (e) {
@@ -30,6 +31,18 @@ window.addEventListener("DOMContentLoaded", async () => {
     window.APP_DESKTOP.init();
   } else if (document.querySelector(".ledger-shell")) {
     window.APP_MOBILE.init();
+    // Initialize Groups module (non-blocking)
+    if (window.APP_GROUPS) {
+      // Store the current user's ID in state for balance lookups
+      try {
+        const storedUser = localStorage.getItem(window.APP_API.USER_KEY);
+        if (storedUser) {
+          const parsed = JSON.parse(storedUser);
+          window.APP_STATE.data.userId = parsed.id;
+        }
+      } catch (_) {}
+      window.APP_GROUPS.init().catch(e => console.warn("[Groups] Init error:", e));
+    }
   }
 
   // 4. Attempt async backend handshake

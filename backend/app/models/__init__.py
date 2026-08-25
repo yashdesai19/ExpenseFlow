@@ -7,6 +7,14 @@ from app.models.budget import Budget
 from app.models.recurring import RecurringExpense
 from app.models.audit_log import AuditLog
 from app.models.settings import UserSettings
+from app.models.group import (
+    Group,
+    GroupMember,
+    GroupExpense,
+    GroupExpensePayment,
+    GroupExpenseParticipant,
+    GroupSettlement,
+)
 
 __all__ = [
     "Base",
@@ -18,4 +26,10 @@ __all__ = [
     "RecurringExpense",
     "AuditLog",
     "UserSettings",
+    "Group",
+    "GroupMember",
+    "GroupExpense",
+    "GroupExpensePayment",
+    "GroupExpenseParticipant",
+    "GroupSettlement",
 ]
