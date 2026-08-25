@@ -209,8 +209,14 @@ class GroupService:
             )
 
         # Verify member has no outstanding balances
-        # (This will be verified dynamically. For now, we allow deletion and will integrate it with the Balance Engine in Phase 4.)
-        # We can add a placeholder comment / check that will be refined.
+        from app.services.balance_service import balance_service
+        balances = balance_service.get_group_balances(db=db, group_id=group_id, user=user)
+        member_balance = next((b for b in balances.balances if b.user_id == target_user_id), None)
+        if member_balance and abs(member_balance.net_balance) > 0.005:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Member '{target_member.user.full_name}' has an outstanding balance of {member_balance.net_balance}. They must settle up before leaving.",
+            )
 
         # Remove member
         group_repo.remove_member(db, member=target_member)

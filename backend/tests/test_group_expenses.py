@@ -212,3 +212,80 @@ async def test_group_expenses_splits_and_calculations():
         )
         assert res_fail2.status_code == 422
         assert "must equal exactly 100%" in res_fail2.json()["errors"][0]
+
+        # 10. Test Shares Split: ₹6000 split Yash 1 share, Rahul 2 shares, Amit 3 shares. Paid entirely by Yash.
+        shares_expense_payload = {
+            "category_id": category_id,
+            "amount": 6000.00,
+            "description": "Boat Party Shares",
+            "date": "2026-08-25",
+            "split_method": "shares",
+            "payments": [{"user_id": yash["id"], "amount": 6000.00}],
+            "participants": [
+                {"user_id": yash["id"], "share_value": 1.0},
+                {"user_id": rahul["id"], "share_value": 2.0},
+                {"user_id": amit["id"], "share_value": 3.0},
+            ],
+        }
+        res6 = await client.post(
+            f"{settings.API_V1_STR}/groups/{group_id}/expenses",
+            headers=yash_headers,
+            json=shares_expense_payload,
+        )
+        assert res6.status_code == 201
+        exp6 = res6.json()
+        parts6 = {p["user_id"]: p for p in exp6["participants"]}
+        assert parts6[yash["id"]]["calculated_amount"] == "1000.00"
+        assert parts6[rahul["id"]]["calculated_amount"] == "2000.00"
+        assert parts6[amit["id"]]["calculated_amount"] == "3000.00"
+
+        # 11. Test updating a group expense (PATCH)
+        update_payload = {
+            "category_id": category_id,
+            "amount": 4000.00,
+            "description": "Boat Party Updated",
+            "date": "2026-08-26",
+            "split_method": "equal",
+            "payments": [{"user_id": yash["id"], "amount": 4000.00}],
+            "participants": [
+                {"user_id": yash["id"], "share_value": 1.0},
+                {"user_id": rahul["id"], "share_value": 1.0},
+                {"user_id": amit["id"], "share_value": 1.0},
+            ],
+        }
+        res_update = await client.patch(
+            f"{settings.API_V1_STR}/groups/{group_id}/expenses/{exp1['id']}",
+            headers=yash_headers,
+            json=update_payload,
+        )
+        assert res_update.status_code == 200
+        updated_exp = res_update.json()
+        assert updated_exp["amount"] == "4000.00"
+        assert updated_exp["description"] == "Boat Party Updated"
+        assert updated_exp["date"] == "2026-08-26"
+
+        # 12. Test that a non-creator member cannot update expense (403)
+        res_forbidden = await client.patch(
+            f"{settings.API_V1_STR}/groups/{group_id}/expenses/{exp1['id']}",
+            headers=amit_headers,
+            json=update_payload,
+        )
+        assert res_forbidden.status_code == 403
+
+        # 13. Test that an outsider (non-member) cannot access/update expense (403)
+        outsider_email = f"outsider_{uuid.uuid4().hex[:8]}@example.com"
+        await client.post(
+            f"{settings.API_V1_STR}/auth/register",
+            json={"email": outsider_email, "password": "Password123!", "full_name": "Outsider"},
+        )
+        outsider_login = await client.post(
+            f"{settings.API_V1_STR}/auth/login",
+            json={"email": outsider_email, "password": "Password123!"},
+        )
+        outsider_headers = {"Authorization": f"Bearer {outsider_login.json()['access_token']}"}
+        res_outsider = await client.patch(
+            f"{settings.API_V1_STR}/groups/{group_id}/expenses/{exp1['id']}",
+            headers=outsider_headers,
+            json=update_payload,
+        )
+        assert res_outsider.status_code == 403

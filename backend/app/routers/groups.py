@@ -235,6 +235,28 @@ def delete_group_expense(
     return MessageResponse(message="Group expense successfully deleted.")
 
 
+@router.patch(
+    "/{group_id}/expenses/{expense_id}",
+    response_model=GroupExpenseResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update group expense",
+    description="Updates a group expense. Restricts to owner/admin or expense creator. Cannot modify settled expenses.",
+)
+def update_group_expense(
+    group_id: int,
+    expense_id: int,
+    expense_in: GroupExpenseCreate,
+    request: Request,
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    db: Annotated[Session, Depends(get_db)],
+) -> GroupExpenseResponse:
+    client_ip = request.client.host if request.client else None
+    expense = group_expense_service.update_group_expense(
+        db=db, group_id=group_id, expense_id=expense_id, expense_in=expense_in, user=current_user, ip_address=client_ip
+    )
+    return GroupExpenseResponse.model_validate(expense)
+
+
 @router.get(
     "/{group_id}/balances",
     response_model=GroupBalanceResponse,

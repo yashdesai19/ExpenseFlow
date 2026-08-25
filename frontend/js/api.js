@@ -199,6 +199,13 @@ window.APP_API = {
     });
   },
 
+  async updateGroupExpense(groupId, expenseId, payload) {
+    return await this.request(`/groups/${groupId}/expenses/${expenseId}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload)
+    });
+  },
+
   async deleteGroupExpense(groupId, expenseId) {
     return await this.request(`/groups/${groupId}/expenses/${expenseId}`, {
       method: "DELETE"

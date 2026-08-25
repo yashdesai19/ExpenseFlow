@@ -244,5 +244,115 @@ class GroupExpenseService:
         db.delete(expense)
         db.commit()
 
+    @staticmethod
+    def update_group_expense(
+        db: Session, group_id: int, expense_id: int, expense_in: GroupExpenseCreate, user: User, ip_address: Optional[str] = None
+    ) -> GroupExpense:
+        # Check membership
+        if not group_repo.is_member(db, group_id=group_id, user_id=user.id):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not a member of this group.")
+
+        # Get the existing expense
+        expense = GroupExpenseService.get_group_expense(db, group_id=group_id, expense_id=expense_id, user=user)
+
+        # Check if expense can be updated - only creator or admin/owner can update
+        membership = group_repo.get_member(db, group_id=group_id, user_id=user.id)
+        is_creator = (expense.created_by_id == user.id)
+        is_admin = membership and (membership.role == "admin" or expense.group.owner_id == user.id)
+
+        if not is_creator and not is_admin:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Only the expense creator or group admins can update this expense.",
+            )
+
+        # Verify Category exists
+        category = db.scalar(select(Category).where(Category.id == expense_in.category_id))
+        if not category:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid Category ID.")
+
+        # Verify all payers and participants are group members
+        member_ids = {m.user_id for m in expense.group.members}
+        for payment in expense_in.payments:
+            if payment.user_id not in member_ids:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"User ID {payment.user_id} in payments is not a member of this group.",
+                )
+
+        for participant in expense_in.participants:
+            if participant.user_id not in member_ids:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"User ID {participant.user_id} in participants is not a member of this group.",
+                )
+
+        # Calculate Split Amounts
+        calculated_shares = GroupExpenseService.calculate_splits(
+            amount=expense_in.amount,
+            split_method=expense_in.split_method,
+            participants=expense_in.participants,
+        )
+
+        # Update expense fields
+        expense.category_id = expense_in.category_id
+        expense.amount = expense_in.amount
+        expense.description = expense_in.description.strip()
+        expense.date = expense_in.date
+        expense.notes = expense_in.notes.strip() if expense_in.notes else None
+        expense.split_method = expense_in.split_method
+
+        # Remove old payments and participants
+        db.query(GroupExpensePayment).filter(GroupExpensePayment.group_expense_id == expense.id).delete()
+        db.query(GroupExpenseParticipant).filter(GroupExpenseParticipant.group_expense_id == expense.id).delete()
+
+        # Add new Payments
+        for payment in expense_in.payments:
+            db_payment = GroupExpensePayment(
+                group_expense_id=expense.id,
+                user_id=payment.user_id,
+                amount=payment.amount,
+            )
+            db.add(db_payment)
+
+        # Add new Participants
+        for idx, participant in enumerate(expense_in.participants):
+            db_participant = GroupExpenseParticipant(
+                group_expense_id=expense.id,
+                user_id=participant.user_id,
+                share_value=participant.share_value,
+                calculated_amount=calculated_shares[idx],
+            )
+            db.add(db_participant)
+
+        # Log Audit
+        audit = AuditLog(
+            user_id=user.id,
+            action="GROUP_EXPENSE_UPDATED",
+            resource_type="group_expense",
+            resource_id=str(expense.id),
+            details={
+                "group_id": group_id,
+                "amount": str(expense.amount),
+                "description": expense.description,
+            },
+            ip_address=ip_address,
+        )
+        db.add(audit)
+
+        db.commit()
+
+        # Re-fetch with relationships loaded
+        return (
+            db.query(GroupExpense)
+            .options(
+                joinedload(GroupExpense.category),
+                joinedload(GroupExpense.payments).joinedload(GroupExpensePayment.user),
+                joinedload(GroupExpense.participants).joinedload(GroupExpenseParticipant.user),
+            )
+            .filter(GroupExpense.id == expense.id)
+            .first()
+        )
+
 
 group_expense_service = GroupExpenseService()

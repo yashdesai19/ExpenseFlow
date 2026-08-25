@@ -693,6 +693,7 @@
         <button class="l-seg-btn active" id="lGrpSplitBtn-equal" onclick="window.APP_GROUPS.setSplitMethod('equal')">Equal</button>
         <button class="l-seg-btn" id="lGrpSplitBtn-exact" onclick="window.APP_GROUPS.setSplitMethod('exact')">Exact</button>
         <button class="l-seg-btn" id="lGrpSplitBtn-percentage" onclick="window.APP_GROUPS.setSplitMethod('percentage')">%</button>
+        <button class="l-seg-btn" id="lGrpSplitBtn-shares" onclick="window.APP_GROUPS.setSplitMethod('shares')">Shares</button>
       </div>
     </div>
 
@@ -748,7 +749,68 @@
   </div>
 </div>
 
-<!-- 10. Group Settings Sheet -->
+<!-- 10. Expense Detail Sheet -->
+<div class="sheet-overlay" id="lExpenseDetailOverlay" onclick="if(event.target.id==='lExpenseDetailOverlay') window.APP_GROUPS.closeGroupSheet('lExpenseDetailOverlay')">
+  <div class="bottom-sheet-panel">
+    <div class="sheet-handle"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="font-family:var(--font-serif); font-size:19px; font-weight:600;">Expense Details</h3>
+      <button onclick="window.APP_GROUPS.closeGroupSheet('lExpenseDetailOverlay')" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
+    </div>
+
+    <div id="lExpenseDetailContent" style="display:flex; flex-direction:column; gap:14px;">
+      <!-- Populated dynamically -->
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <button class="btn-brass-primary" id="lExpenseEditBtn" style="justify-content:center; font-size:13px;" onclick="window.APP_GROUPS.openExpenseEditSheet()">✏️ Edit</button>
+      <button class="btn-brass-secondary" id="lExpenseDeleteBtn" style="justify-content:center; font-size:13px; background:var(--danger-soft); color:var(--danger);" onclick="window.APP_GROUPS.deleteExpenseConfirm()">🗑 Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- 11. Edit Group Expense Sheet -->
+<div class="sheet-overlay" id="lEditGroupExpenseOverlay" onclick="if(event.target.id==='lEditGroupExpenseOverlay') window.APP_GROUPS.closeGroupSheet('lEditGroupExpenseOverlay')">
+  <div class="bottom-sheet-panel" style="max-height:92vh; overflow-y:auto;">
+    <div class="sheet-handle"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="font-family:var(--font-serif); font-size:19px; font-weight:600;">Edit Group Expense</h3>
+      <button onclick="window.APP_GROUPS.closeGroupSheet('lEditGroupExpenseOverlay')" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
+    </div>
+
+    <input type="hidden" id="lGrpExpEditId">
+
+    <div style="display:flex; align-items:baseline; gap:6px; border-bottom:1px solid var(--border); padding:10px 0;">
+      <span style="font-family:var(--font-serif); font-size:26px; color:var(--text-muted);">₹</span>
+      <input class="money" id="lGrpExpEditAmt" type="number" step="0.01" placeholder="0" style="border:none; outline:none; background:transparent; font-family:var(--font-serif); font-size:32px; color:var(--text); width:100%;">
+    </div>
+
+    <div>
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Description*</label>
+      <input class="l-input" id="lGrpExpEditDesc" placeholder="e.g. Hotel, Dinner, Taxi">
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <div>
+        <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Category</label>
+        <select class="l-input" id="lGrpExpEditCategory" style="font-size:12.5px;"></select>
+      </div>
+      <div>
+        <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Date</label>
+        <input class="l-input" type="date" id="lGrpExpEditDate">
+      </div>
+    </div>
+
+    <div>
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Notes (optional)</label>
+      <textarea class="l-input" id="lGrpExpEditNotes" rows="2" placeholder="Add memorandum..."></textarea>
+    </div>
+
+    <button class="btn-brass-primary" onclick="window.APP_GROUPS.saveGroupExpenseEdit()" style="width:100%; padding:13px; font-size:15px; margin-top:6px; justify-content:center;">Save Changes</button>
+  </div>
+</div>
+
+<!-- 12. Group Settings Sheet -->
 <div class="sheet-overlay" id="lGroupSettingsOverlay" onclick="if(event.target.id==='lGroupSettingsOverlay') window.APP_GROUPS.closeGroupSheet('lGroupSettingsOverlay')">
   <div class="bottom-sheet-panel">
     <div class="sheet-handle"></div>

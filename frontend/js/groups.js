@@ -255,7 +255,7 @@ window.APP_GROUPS = {
   renderExpenseCard(expense) {
     const myId = this.getMyUserId();
     const myPart = expense.participants ? expense.participants.find(p => p.user_id === myId) : null;
-    const myShare = myPart ? parseFloat(myPart.owed_amount) : 0;
+    const myShare = myPart ? parseFloat(myPart.calculated_amount) : 0;
     const paidBy = expense.payments && expense.payments[0] ? expense.payments[0].full_name || expense.payments[0].payer_name || "Someone" : "Someone";
     const myPaid = expense.payments ? expense.payments.filter(p => p.user_id === myId).reduce((s, p) => s + parseFloat(p.amount), 0) : 0;
 
@@ -274,7 +274,10 @@ window.APP_GROUPS = {
     }
 
     return `
-      <div class="l-card" style="padding:12px 14px; display:flex; gap:12px; align-items:flex-start;">
+      <div class="l-card" style="padding:12px 14px; display:flex; gap:12px; align-items:flex-start; cursor:pointer;"
+           onclick="window.APP_GROUPS.openExpenseDetail(${expense.id})"
+           onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''"
+           ontouchstart="this.style.transform='scale(0.98)'" ontouchend="this.style.transform=''">
         <div style="width:38px; height:38px; border-radius:10px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0; border:1px solid var(--border);">💸</div>
         <div style="flex:1; min-width:0;">
           <div style="font-size:13.5px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${expense.description}</div>
@@ -560,7 +563,7 @@ window.APP_GROUPS = {
 
   setSplitMethod(method) {
     this.currentSplitMethod = method;
-    ["equal", "exact", "percentage"].forEach(m => {
+    ["equal", "exact", "percentage", "shares"].forEach(m => {
       const btn = document.getElementById(`lGrpSplitBtn-${m}`);
       if (btn) btn.classList.toggle("active", m === method);
     });
@@ -580,6 +583,8 @@ window.APP_GROUPS = {
         inputHtml = `<input type="number" step="0.01" placeholder="0.00" data-uid="${m.user_id}" class="l-input" style="width:100px; padding:6px 8px; font-size:12.5px; text-align:right;">`;
       } else if (method === "percentage") {
         inputHtml = `<div style="display:flex; align-items:center; gap:4px;"><input type="number" step="1" min="0" max="100" placeholder="0" data-uid="${m.user_id}" class="l-input" style="width:70px; padding:6px 8px; font-size:12.5px; text-align:right;"><span style="font-size:12px; color:var(--text-muted);">%</span></div>`;
+      } else if (method === "shares") {
+        inputHtml = `<input type="number" step="1" placeholder="1" data-uid="${m.user_id}" class="l-input" style="width:80px; padding:6px 8px; font-size:12.5px; text-align:right;">`;
       }
 
       return `
@@ -604,10 +609,7 @@ window.APP_GROUPS = {
     if (!amount || amount <= 0) { this.toast("Please enter a valid amount", "error"); return; }
     if (!description) { this.toast("Please add a description", "error"); return; }
 
-    // Build payments array (single payer for now)
-    const payments = [{ user_id: paidById, amount }];
-
-    // Build participants array
+    // Build participants array first
     const container = document.getElementById("lGrpParticipantsContainer");
     let participants = [];
 
@@ -622,8 +624,31 @@ window.APP_GROUPS = {
       const inputs = container ? container.querySelectorAll("input[type=number]") : [];
       inputs.forEach(inp => {
         const val = parseFloat(inp.value) || 0;
-        if (val > 0) participants.push({ user_id: parseInt(inp.dataset.uid), share_value: val });
+        if (val > 0) {
+          participants.push({ user_id: parseInt(inp.dataset.uid), share_value: val });
+        }
       });
+    }
+
+    // Validate based on split method
+    if (method === "exact") {
+      const totalShare = participants.reduce((sum, p) => sum + p.share_value, 0);
+      if (Math.abs(totalShare - amount) > 0.01) {
+        this.toast(`For exact splits, the sum of shares (${totalShare}) must equal the total amount (${amount})`, "error");
+        return;
+      }
+    } else if (method === "percentage") {
+      const totalPct = participants.reduce((sum, p) => sum + p.share_value, 0);
+      if (Math.abs(totalPct - 100) > 0.01) {
+        this.toast(`For percentage splits, the sum of percentages (${totalPct}) must equal exactly 100%`, "error");
+        return;
+      }
+    } else if (method === "shares") {
+      const totalShares = participants.reduce((sum, p) => sum + p.share_value, 0);
+      if (totalShares <= 0) {
+        this.toast("For shares splits, the sum of shares must be greater than 0", "error");
+        return;
+      }
     }
 
     if (participants.length === 0) { this.toast("Select at least one participant", "error"); return; }
@@ -635,7 +660,7 @@ window.APP_GROUPS = {
         description,
         date,
         split_method: method,
-        payments,
+        payments: [{ user_id: paidById, amount }],
         participants,
       });
       this.closeGroupSheet("lAddGroupExpenseOverlay");
@@ -644,6 +669,222 @@ window.APP_GROUPS = {
     } catch (err) {
       this.toast(err.message || "Failed to add expense", "error");
     }
+  },
+
+  /* ================================================================
+     EXPENSE DETAIL & EDIT
+     ================================================================ */
+  openExpenseDetail(expenseId) {
+    const expense = this.currentExpenses.find(e => e.id === expenseId);
+    if (!expense) return;
+
+    this.currentEditExpenseId = expenseId;
+
+    const myId = this.getMyUserId();
+    const myPart = expense.participants ? expense.participants.find(p => p.user_id === myId) : null;
+    const myShare = myPart ? parseFloat(myPart.calculated_amount) : 0;
+    const paidBy = expense.payments && expense.payments[0] ? expense.payments[0].full_name || expense.payments[0].payer_name || "Someone" : "Someone";
+    const myPaid = expense.payments ? expense.payments.filter(p => p.user_id === myId).reduce((s, p) => s + parseFloat(p.amount), 0) : 0;
+
+    let shareLabel = "";
+    let shareColor = "var(--text-muted)";
+    let totalPaid = 0;
+    let totalOwed = 0;
+
+    if (myPaid > 0 && myShare > 0) {
+      const net = myPaid - myShare;
+      shareLabel = net > 0 ? `You lent ${this.fmt(net)}` : net < 0 ? `You owe ${this.fmt(net)}` : "You're settled";
+      shareColor = net > 0 ? "var(--success)" : net < 0 ? "var(--danger)" : "var(--text-muted)";
+      totalPaid = myPaid;
+      totalOwed = myShare;
+    } else if (myPaid > 0) {
+      shareLabel = `You paid ${this.fmt(myPaid)}`;
+      shareColor = "var(--success)";
+      totalPaid = myPaid;
+    } else if (myShare > 0) {
+      shareLabel = `You owe ${this.fmt(myShare)}`;
+      shareColor = "var(--danger)";
+      totalOwed = myShare;
+    }
+
+    const totalPeople = expense.participants ? expense.participants.length : 0;
+    const peopleText = totalPeople > 1 ? `split among ${totalPeople} participants` : "single record";
+
+    const detailContent = `
+      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--accent); margin-bottom:8px;">Expense Details</div>
+      <div style="display:flex; align-items:baseline; gap:6px; margin-bottom:12px;">
+        <span style="font-family:var(--font-serif); font-size:26px; color:var(--text-muted);">₹</span>
+        <span style="font-family:var(--font-serif); font-size:32px; font-weight:700; color:var(--text);">${this.fmt(expense.amount)}</span>
+      </div>
+      <div style="display:flex; gap:8px; margin-bottom:8px; font-size:13px;">
+        <div>
+          <div style="color:var(--text-muted);">Description</div>
+          <div style="font-weight:600;">${expense.description}</div>
+        </div>
+        <div>
+          <div style="color:var(--text-muted);">Date</div>
+          <div>${expense.date || ""}</div>
+        </div>
+        <div>
+          <div style="color:var(--text-muted);">Split Method</div>
+          <div style="font-weight:600;">${expense.split_method}</div>
+        </div>
+        <div>
+          <div style="color:var(--text-muted);">Participants</div>
+          <div>${peopleText}</div>
+        </div>
+      </div>
+      <div style="background:var(--card-alt); border:1px solid var(--border); padding:12px; margin-bottom:12px;">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--accent); margin-bottom:6px;">Amount Breakdown</div>
+        <div style="font-size:12px; color:var(--text);">${paidBy} paid ₹${this.fmt(expense.amount)}</div>
+        ${expense.participants.map(p => `
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border);">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <div style="width:24px; height:24px; border-radius:8px; background:linear-gradient(135deg, var(--accent-soft), var(--card-alt)); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--accent);">${(p.user.full_name || p.user.email || "?")[0].toUpperCase()}</div>
+              <span style="font-size:12px; color:var(--text);">${p.user.full_name || p.user.email}</span>
+            </div>
+            <div class="money" style="font-size:13px; font-weight:600; color:var(--danger);">${this.fmt(p.calculated_amount)}</div>
+          </div>`).join("")}
+        <div style="display:flex; justify-content:space-between; font-weight:700;">
+          <span>Total Paid: ₹${this.fmt(expense.amount)}</span>
+          <span style="color:var(--success);">Total Owed: ₹${this.fmt(expense.amount)}</span>
+        </div>
+      </div>
+      <div style="font-size:11px; color:var(--text-muted);">${shareLabel}</div>
+    `;
+
+    document.getElementById("lExpenseDetailContent").innerHTML = detailContent;
+    this.openSheet("lExpenseDetailOverlay");
+  },
+
+  closeExpenseDetail() {
+    this.closeGroupSheet("lExpenseDetailOverlay");
+    delete this.currentEditExpenseId;
+  },
+
+  openExpenseEditSheet() {
+    if (!this.currentEditExpenseId) return;
+
+    const expense = this.currentExpenses.find(e => e.id === this.currentEditExpenseId);
+    if (!expense) return;
+
+    // Pre-fill the edit form
+    document.getElementById("lGrpExpEditId").value = expense.id;
+    document.getElementById("lGrpExpEditAmt").value = expense.amount;
+    document.getElementById("lGrpExpEditDesc").value = expense.description;
+    document.getElementById("lGrpExpEditDate").value = expense.date || this.todayStr();
+
+    // Populate category
+    const catSel = document.getElementById("lGrpExpEditCategory");
+    if (catSel && this.categories.length > 0) {
+      catSel.innerHTML = this.categories
+        .filter(c => c.name !== "Income")
+        .map(c => `<option value="${c.id}" ${c.id === expense.category_id ? "selected" : ""}>${c.icon || ""} ${c.name}</option>`)
+        .join("");
+    }
+
+    // Populate paid-by selector
+    const paidBySel = document.getElementById("lGrpExpEditPaidBy");
+    if (paidBySel) {
+      paidBySel.innerHTML = this.currentMembers.map(m =>
+        `<option value="${m.user_id}" ${m.user_id === this.getMyUserId() ? "selected" : ""}>${m.full_name || m.email}</option>`
+      ).join("");
+    }
+    // Select current paid-by
+    if (paidBySel) {
+      const currentPaidId = expense.payments ? expense.payments[0].user_id : null;
+      if (paidBySel.querySelector(`option[value="${currentPaidId}"]`)) {
+        paidBySel.value = currentPaidId;
+      }
+    }
+
+    this.openSheet("lEditGroupExpenseOverlay");
+  },
+
+  async saveGroupExpenseEdit() {
+    const expenseId = parseInt((document.getElementById("lGrpExpEditId") || {}).value);
+    const expense = this.currentExpenses.find(e => e.id === expenseId);
+
+    // Check if expense is settled before allowing edit
+    const totalPaidByMe = expense.payments ? expense.payments.filter(p => p.user_id === this.getMyUserId()).reduce((s, p) => s + parseFloat(p.amount), 0) : 0;
+    const owedByMe = expense.participants ? expense.participants.filter(p => p.user_id === this.getMyUserId()).reduce((s, p) => s + parseFloat(p.calculated_amount), 0) : 0;
+    const netBalance = totalPaidByMe - owedByMe;
+
+    // Check if my balance is zero or positive (I could have made a payment or been paid)
+    if (netBalance >= 0) {
+      this.toast("Cannot edit expense: your financial position has been settled", "error");
+      return;
+    }
+
+    const amount = parseFloat((document.getElementById("lGrpExpEditAmt") || {}).value) || 0;
+    const description = (document.getElementById("lGrpExpEditDesc") || {}).value?.trim();
+    const date = (document.getElementById("lGrpExpEditDate") || {}).value;
+    const categoryId = parseInt((document.getElementById("lGrpExpEditCategory") || {}).value) || 1;
+    const paidById = parseInt((document.getElementById("lGrpExpEditPaidBy") || {}).value);
+
+    if (!amount || amount <= 0) { this.toast("Please enter a valid amount", "error"); return; }
+    if (!description) { this.toast("Please add a description", "error"); return; }
+
+    // Build payments and participants based on current split method
+    let payments = [{ user_id: paidById, amount }];
+
+    // Build participants array with current split method
+    let participants = [];
+
+    if (this.currentSplitMethod === "equal") {
+      this.currentMembers.forEach(m => {
+        participants.push({ user_id: m.user_id, share_value: 1 });
+      });
+    } else {
+      // For exact, percentage, or shares, use the current expense's participant data as base
+      participants = expense.participants.map(p => ({ user_id: p.user_id, share_value: p.share_value }));
+    }
+
+    try {
+      await window.APP_API.updateGroupExpense(this.currentGroupId, expenseId, {
+        category_id: categoryId,
+        amount,
+        description,
+        date,
+        split_method: this.currentSplitMethod,
+        payments,
+        participants,
+      });
+      this.toast("Expense updated!");
+      this.closeGroupSheet("lEditGroupExpenseOverlay");
+      await this.openGroupDetail(this.currentGroupId);
+    } catch (err) {
+      this.toast(err.message || "Failed to update expense", "error");
+    }
+  },
+
+  async confirmDeleteExpense(expenseId) {
+    // First check if user has settled balance before deleting
+    const expense = this.currentExpenses.find(e => e.id === expenseId);
+
+    const totalPaidByMe = expense.payments ? expense.payments.filter(p => p.user_id === this.getMyUserId()).reduce((s, p) => s + parseFloat(p.amount), 0) : 0;
+    const owedByMe = expense.participants ? expense.participants.filter(p => p.user_id === this.getMyUserId()).reduce((s, p) => s + parseFloat(p.calculated_amount), 0) : 0;
+    const netBalance = totalPaidByMe - owedByMe;
+
+    if (netBalance !== 0) {
+      this.toast("Cannot delete expense: your financial position is unsettled. Settle up first.", "error");
+      return;
+    }
+
+    if (!confirm("Delete this expense? This cannot be undone.")) return;
+    try {
+      await window.APP_API.deleteGroupExpense(this.currentGroupId, expenseId);
+      this.toast("Expense deleted.");
+      this.closeGroupSheet("lEditGroupExpenseOverlay");
+      await this.openGroupDetail(this.currentGroupId);
+    } catch (err) {
+      this.toast(err.message || "Failed to delete expense", "error");
+    }
+  },
+
+  deleteExpenseConfirm() {
+    if (!this.currentEditExpenseId) return;
+    this.confirmDeleteExpense(this.currentEditExpenseId);
   },
 
   /* ================================================================
