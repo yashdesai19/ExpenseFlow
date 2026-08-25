@@ -360,9 +360,21 @@
 const API_BASE = (() => {
   const h = window.location.hostname;
   const o = window.location.origin;
-  if (o.includes(':3001')) return `http://${h}:8081/api/v1`;
-  if (o.includes(':8081')) return o + '/api/v1';
-  return 'http://127.0.0.1:8081/api/v1';
+  
+  // If running on local development (non-production ports/localhost)
+  if (!h || h === 'localhost' || h === '127.0.0.1') {
+    if (o.includes(':3001')) return `http://${h}:8081/api/v1`;
+    if (o.includes(':8081')) return o + '/api/v1';
+    return 'http://127.0.0.1:8081/api/v1';
+  }
+  
+  // If hosted on a separate static frontend site on Render, point to the deployed backend URL
+  if (h.includes('frontend') || h.includes('static') || h.includes('1add') === false) {
+    return 'https://expenseflow-1add.onrender.com/api/v1';
+  }
+  
+  // Served from the backend origin itself (via /ui mount)
+  return o + '/api/v1';
 })();
 
 const TOKEN_KEY = 'expenseflow_auth_token';
@@ -392,11 +404,8 @@ applyTheme();
     .catch(() => {});
 })();
 
-function isMobile() {
-  return window.innerWidth <= 800 || /Mobi|Android/i.test(navigator.userAgent);
-}
 function redirectToApp() {
-  window.location.href = isMobile() ? 'mobile.html' : 'index.html';
+  window.location.href = 'index.html';
 }
 
 // ---- Tab Switcher ----

@@ -2,8 +2,8 @@
 <html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ExpenseFlow Pro — The Ledger Workspace</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ExpenseFlow Pro — The Ledger Mobile</title>
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,402 +14,525 @@
 <link rel="stylesheet" href="css/variables.css">
 <link rel="stylesheet" href="css/layout.css">
 <link rel="stylesheet" href="css/components.css">
+
+<style>
+/* Additional Mobile Micro-Styles */
+.cat-pills-row {
+  display: flex;
+  gap: 10px;
+  margin: 0 -18px;
+  padding: 2px 18px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.cat-pills-row::-webkit-scrollbar { display: none; }
+
+.cat-pill-item {
+  flex: 0 0 120px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  transition: transform var(--trans-fast);
+}
+.cat-pill-item:active { transform: scale(0.96); }
+
+.cat-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.cat-picker-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  transition: border-color var(--trans-fast);
+}
+.cat-picker-btn.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+</style>
 </head>
 
-<body>
+<body class="mobile-center-frame">
 
-<div class="desktop-workspace">
+<div class="ledger-shell">
 
-  <!-- ========================================================================
-       1. LEFT SIDEBAR NAVIGATION
-       ======================================================================== -->
-  <aside class="desktop-sidebar">
-    <div class="brand-badge-desktop">
-      <div class="brand-icon-brass">EF</div>
-      <div>
-        <h3 style="font-family:var(--font-serif); font-size:17px; font-weight:700;">ExpenseFlow</h3>
-        <p style="font-size:11.5px; color:var(--text-muted);">The Ledger SaaS</p>
-      </div>
+  <!-- Fixed Top Header -->
+  <header class="ledger-topbar">
+    <div style="font-family:var(--font-serif); font-size:22px; font-weight:600; color:var(--text);" id="lHeaderTitle">Ledger</div>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <button class="btn-brass-icon" onclick="window.APP_STATE.toggleTheme()" title="Switch Theme">🌓</button>
+      <div id="lTopHeaderAvatar" style="width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg, var(--accent), var(--accent-bright)); color:#1A1408; font-size:12px; font-weight:700; display:grid; place-items:center; cursor:pointer;" onclick="window.APP_MOBILE.showTab('profile')">DY</div>
     </div>
+  </header>
 
-    <nav class="sidebar-nav-list" style="margin-top:10px;">
-      <button class="nav-link-btn active" id="dNav-dashboard" onclick="window.APP_DESKTOP.switchView('dashboard', this)">
-        <span>🏛️</span>
-        <span>Dashboard</span>
-      </button>
-      <button class="nav-link-btn" id="dNav-ledger" onclick="window.APP_DESKTOP.switchView('ledger', this)">
-        <span>📜</span>
-        <span>All Transactions</span>
-      </button>
-      <button class="nav-link-btn" id="dNav-budgets" onclick="window.APP_DESKTOP.switchView('budgets', this)">
-        <span>🎯</span>
-        <span>Budget Ceilings</span>
-      </button>
-      <button class="nav-link-btn" id="dNav-analytics" onclick="window.APP_DESKTOP.switchView('analytics', this)">
-        <span>📊</span>
-        <span>Analytics &amp; Cashflow</span>
-      </button>
-      <button class="nav-link-btn" id="dNav-settings" onclick="window.APP_DESKTOP.switchView('settings', this)">
-        <span>⚙️</span>
-        <span>Settings</span>
-      </button>
-    </nav>
-
-    <!-- Switch to Mobile Link -->
-    <div style="margin-top:auto; padding-top:16px; border-top:1px solid var(--border);">
-      <a href="mobile.html" class="nav-link-btn" style="text-decoration:none; color:var(--accent); font-weight:700;">
-        <span>📱</span>
-        <span>Open Mobile View</span>
-      </a>
-    </div>
-  </aside>
-
-  <!-- ========================================================================
-       2. MAIN WORKSPACE CANVAS
-       ======================================================================== -->
-  <main class="desktop-main-canvas">
-
-    <!-- Topbar Header -->
-    <header class="desktop-topbar">
-      <div class="top-search-trigger" onclick="window.APP_DESKTOP.openAddModal()">
-        <span>🔍 Search transactions, merchants, accounts...</span>
-        <span class="kbd-pill">⌘K</span>
-      </div>
-
-      <div class="top-actions-desktop">
-        <button class="btn-brass-primary" onclick="window.APP_DESKTOP.openAddModal()">+ Record Transaction</button>
-        <button class="btn-brass-secondary" onclick="window.APP_STATE.toggleTheme()">🌓 Theme</button>
-        <button type="button" class="btn-brass-secondary" id="dAuthBtn" onclick="window.APP_DESKTOP.handleAuthAction()">
-          <span id="dAuthBtnText">🔑 Sign In</span>
-        </button>
-      </div>
-    </header>
+  <!-- Scrollable Main Content -->
+  <main class="ledger-scroll-body" id="lScrollBody">
 
     <!-- ====================================================================
-         VIEW 1: DASHBOARD
+         VIEW 1: HOME (ALL-IN-ONE SCREEN)
          ==================================================================== -->
-    <div class="desktop-content-grid" id="dViewSec-dashboard">
+    <div id="lView-home" style="display:flex; flex-direction:column; gap:18px;">
+      
+      <!-- Hero Ledger Card -->
+      <div class="hero-ledger-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent-bright); font-weight:600;">Mehta Ventures</div>
+          <span style="font-size:16px; color:var(--accent-bright);">💼</span>
+        </div>
 
-      <!-- TOP KPI DECK -->
-      <section class="kpi-deck">
-        <!-- Hero Balance -->
-        <div class="hero-ledger-panel">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent-bright);">Liquid Capital</span>
-            <span style="font-size:13px; color:var(--accent); font-weight:600;">August 2026</span>
+        <div style="font-family:var(--font-serif); font-size:36px; font-weight:560; color:var(--text); letter-spacing:-0.01em; margin:12px 0 2px; display:flex; align-items:baseline; gap:8px;">
+          <span id="lHeroBal">₹0</span>
+          <button onclick="window.APP_STATE.toggleMask()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:16px;" title="Toggle Privacy Mask">👁️</button>
+        </div>
+        <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">Net liquid balance · August 2026</div>
+
+        <div style="display:flex; gap:24px; margin-top:18px;">
+          <div>
+            <div style="color:var(--success); font-size:11.5px; font-weight:600;">↗ Income</div>
+            <div class="money" id="lHeroIncome" style="font-size:14px; font-weight:600; margin-top:2px;">+₹0</div>
           </div>
-          <div class="money serif" style="font-size:38px; font-weight:600; margin:10px 0 4px;" id="dTotalBalance">₹0</div>
-          <div style="font-size:12px; color:var(--text-muted);">Total liquid reserves across business accounts</div>
+          <div>
+            <div style="color:var(--danger); font-size:11.5px; font-weight:600;">↘ Spent</div>
+            <div class="money" id="lHeroSpent" style="font-size:14px; font-weight:600; margin-top:2px;">-₹0</div>
+          </div>
         </div>
 
-        <!-- Inflow KPI -->
-        <div class="kpi-card">
-          <span style="font-size:12px; font-weight:600; color:var(--text-muted);">Monthly Inflows</span>
-          <div class="money" style="font-size:24px; font-weight:700; color:var(--success);" id="dTotalIncome">+₹0</div>
-          <span style="font-size:11.5px; color:var(--text-muted);">0 active retainers</span>
-        </div>
+        <!-- Embedded Running Net-Worth Sparkline -->
+        <svg width="100%" height="36" viewBox="0 0 260 36" style="margin-top:16px; display:block;" preserveAspectRatio="none">
+          <path id="lHeroSparkline" d="M 0 32 L 260 32" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
 
-        <!-- Outflow KPI -->
-        <div class="kpi-card">
-          <span style="font-size:12px; font-weight:600; color:var(--text-muted);">Monthly Outflows</span>
-          <div class="money" style="font-size:24px; font-weight:700; color:var(--danger);" id="dTotalSpent">-₹0</div>
-          <span style="font-size:11.5px; color:var(--text-muted);">0 recorded debits</span>
+      <!-- Quick Action Buttons Strip -->
+      <div style="display:flex; justify-content:space-between; padding:2px 4px;">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer;" onclick="window.APP_MOBILE.openAddSheet('expense')">
+          <div class="btn-brass-icon" style="width:48px; height:48px; font-size:18px;">💸</div>
+          <span style="font-size:11px; font-weight:600; color:var(--text-sec);">Expense</span>
         </div>
-
-        <!-- Net Savings KPI -->
-        <div class="kpi-card">
-          <span style="font-size:12px; font-weight:600; color:var(--text-muted);">Net Savings Rate</span>
-          <div class="money" style="font-size:24px; font-weight:700; color:var(--accent);" id="dSavingsRate">0%</div>
-          <span style="font-size:11.5px; color:var(--text-sec);">+₹0 retained</span>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer;" onclick="window.APP_MOBILE.openAddSheet('income')">
+          <div class="btn-brass-icon" style="width:48px; height:48px; font-size:18px;">💰</div>
+          <span style="font-size:11px; font-weight:600; color:var(--text-sec);">Income</span>
         </div>
-      </section>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer;" onclick="window.APP_MOBILE.showTab('insights')">
+          <div class="btn-brass-icon" style="width:48px; height:48px; font-size:18px;">🎯</div>
+          <span style="font-size:11px; font-weight:600; color:var(--text-sec);">Budget</span>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer;" onclick="window.APP_MOBILE.exportCSV()">
+          <div class="btn-brass-icon" style="width:48px; height:48px; font-size:18px;">📥</div>
+          <span style="font-size:11px; font-weight:600; color:var(--text-sec);">Export</span>
+        </div>
+      </div>
 
-      <!-- 2-COLUMN SPLIT (CHART + CATEGORY METERS) -->
-      <section class="split-dashboard-row">
-        <!-- 6-Month Cashflow Area Curve -->
-        <div class="table-card-desktop">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <h3 style="font-family:var(--font-serif); font-size:18px; font-weight:600;">6-Month Cashflow Trajectory</h3>
-              <p style="font-size:12px; color:var(--text-muted);">Monthly income vs expense burn trajectory</p>
+      <!-- Category Breakdown Pills -->
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:13px; font-weight:700;">
+          <span>This month</span>
+          <a style="color:var(--accent); font-size:12px; font-weight:600; text-decoration:none; cursor:pointer;" onclick="window.APP_MOBILE.showTab('insights')">Analysis →</a>
+        </div>
+        <div class="cat-pills-row" id="lTopCategoryPills"></div>
+      </div>
+
+      <!-- AI Editorial Insights Box -->
+      <div class="l-card" style="background:var(--card-alt); border-color:var(--border-strong);">
+        <div style="font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">✨ Editorial Insights</div>
+        <div id="lInsightsText" style="font-size:12.5px; line-height:1.5; color:var(--text);"></div>
+      </div>
+
+      <!-- Recent Activity List -->
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:13px; font-weight:700;">
+          <span>Recent activity</span>
+          <a style="color:var(--accent); font-size:12px; font-weight:600; text-decoration:none; cursor:pointer;" onclick="window.APP_MOBILE.showTab('transactions')">See all →</a>
+        </div>
+        <div class="l-card" id="lRecentActivityFeed" style="padding:4px 14px;"></div>
+      </div>
+
+    </div>
+
+    <!-- ====================================================================
+         VIEW 2: TRANSACTIONS / LEDGER
+         ==================================================================== -->
+    <div id="lView-transactions" style="display:none; flex-direction:column; gap:14px;">
+      
+      <!-- Month Navigation Bar -->
+      <div class="l-card" style="padding:10px 14px; display:flex; justify-content:space-between; align-items:center; background:linear-gradient(135deg, var(--card), var(--bg-elevated));">
+        <button class="btn-brass-icon" style="width:34px; height:34px;" onclick="window.APP_MOBILE.prevMonth()" title="Previous Month">◀</button>
+        <div style="text-align:center; cursor:pointer;" onclick="window.APP_MOBILE.toggleMonthDropdown()">
+          <div style="font-family:var(--font-serif); font-size:16px; font-weight:700; color:var(--text);" id="lTxMonthTitle">August 2026</div>
+          <div style="font-size:11px; color:var(--accent); font-weight:600;" id="lTxMonthSubtitle">Tap to switch month ▾</div>
+        </div>
+        <button class="btn-brass-icon" style="width:34px; height:34px;" onclick="window.APP_MOBILE.nextMonth()" title="Next Month">▶</button>
+      </div>
+
+      <!-- Month Summary Metrics Card -->
+      <div class="l-card" id="lTxMonthSummaryCard" style="display:flex; justify-content:space-between; align-items:center; padding:12px 14px; background:var(--card-alt); border-color:var(--border-strong);">
+        <div style="text-align:left;">
+          <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.06em; color:var(--success); font-weight:700;">↗ Inflow</div>
+          <div class="money" id="lTxMonthInflow" style="font-size:13.5px; font-weight:700; color:var(--success); margin-top:2px;">+₹0</div>
+        </div>
+        <div style="border-left:1px solid var(--border); height:24px;"></div>
+        <div style="text-align:center;">
+          <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.06em; color:var(--danger); font-weight:700;">↘ Outflow</div>
+          <div class="money" id="lTxMonthOutflow" style="font-size:13.5px; font-weight:700; color:var(--danger); margin-top:2px;">-₹0</div>
+        </div>
+        <div style="border-left:1px solid var(--border); height:24px;"></div>
+        <div style="text-align:right;">
+          <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.06em; color:var(--accent); font-weight:700;">Net Balance</div>
+          <div class="money" id="lTxMonthNet" style="font-size:13.5px; font-weight:700; color:var(--text); margin-top:2px;">₹0</div>
+        </div>
+      </div>
+
+      <!-- Search & Type Filter Strip -->
+      <div style="display:flex; gap:8px;">
+        <input class="l-input" id="lSearchQuery" placeholder="Search merchant, notes, account..." style="border-radius:12px; flex:1;">
+        <select class="l-input" id="lTypeFilter" style="width:115px; border-radius:12px; font-size:12px; padding:0 8px; font-weight:600;" onchange="window.APP_MOBILE.handleFilterChange()">
+          <option value="all">All Types</option>
+          <option value="expense">Expenses</option>
+          <option value="income">Income</option>
+        </select>
+      </div>
+
+      <!-- Month Quick Filter Pills -->
+      <div class="cat-pills-row" id="lMonthPillsRow" style="padding-bottom:2px; gap:8px;"></div>
+
+      <!-- Grouped Transactions List -->
+      <div id="lGroupedTransactionsList" style="display:flex; flex-direction:column; gap:14px;"></div>
+    </div>
+
+    <!-- ====================================================================
+         VIEW 3: INSIGHTS & BUDGETS
+         ==================================================================== -->
+    <div id="lView-insights" style="display:none; flex-direction:column; gap:16px;">
+      <div style="display:flex; gap:12px;">
+        <div class="l-card" style="flex:1;">
+          <div style="font-size:11.5px; color:var(--text-muted); font-weight:600; margin-bottom:4px;">Total Income</div>
+          <div class="money" id="lInsightIncomeVal" style="font-size:16px; font-weight:600; color:var(--success);">₹1,80,500</div>
+        </div>
+        <div class="l-card" style="flex:1;">
+          <div style="font-size:11.5px; color:var(--text-muted); font-weight:600; margin-bottom:4px;">Total Expenses</div>
+          <div class="money" id="lInsightExpenseVal" style="font-size:16px; font-weight:600; color:var(--danger);">₹74,195</div>
+        </div>
+      </div>
+
+      <!-- 6-Month Area Trend -->
+      <div class="l-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <div style="font-size:13px; font-weight:700;">6-month cashflow trajectory</div>
+          <span style="font-size:11px; color:var(--text-muted);" id="lChartStatusLabel">Baseline Flat</span>
+        </div>
+        <svg viewBox="0 0 360 120" width="100%" height="120">
+          <defs>
+            <linearGradient id="lAreaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="var(--accent)" stop-opacity="0.0"/>
+            </linearGradient>
+          </defs>
+          <path id="lInsightsAreaPath" d="M 10 110 L 350 110 L 350 115 L 10 115 Z" fill="url(#lAreaGrad)"/>
+          <path id="lInsightsLinePath" d="M 10 110 L 350 110" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <!-- Category Share -->
+      <div class="l-card">
+        <div style="font-size:13px; font-weight:700; margin-bottom:12px;">Where it went (Category Share)</div>
+        <div id="lCategoryShareList" style="display:flex; flex-direction:column; gap:8px;"></div>
+      </div>
+
+      <!-- Budgets -->
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div style="font-size:13px; font-weight:700;">Monthly Category Ceilings</div>
+          <button class="btn-brass-primary" style="padding:4px 10px; font-size:11.5px;" onclick="window.APP_MOBILE.openNewCategorySheet()">+ New Category</button>
+        </div>
+        <div id="lBudgetsContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         VIEW 4: PROFILE & PREFERENCES
+         ==================================================================== -->
+    <div id="lView-profile" style="display:none; flex-direction:column; gap:16px;">
+      
+      <!-- 1. Identity & Business Tier Card -->
+      <div class="hero-ledger-panel">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <div style="width:52px; height:52px; border-radius:16px; background:linear-gradient(135deg, var(--accent), var(--accent-bright)); display:flex; align-items:center; justify-content:center; font-family:var(--font-serif); font-size:20px; color:#1A1408; font-weight:700; box-shadow:0 6px 16px rgba(201,164,103,0.4);" id="lProfileAvatar">
+              RM
             </div>
-            <span style="font-size:12px; font-weight:600; color:var(--accent); background:var(--accent-soft); padding:4px 10px; border-radius:99px;">Live</span>
+            <div>
+              <div style="font-size:17px; font-weight:700; font-family:var(--font-serif);" id="lProfileName">Ravi Mehta</div>
+              <div style="font-size:12px; color:var(--accent-bright); font-weight:600;" id="lProfileBusiness">Mehta Ventures</div>
+              <div style="font-size:11px; color:var(--text-muted);" id="lProfileEmail">ravi@mehtaventures.com</div>
+            </div>
           </div>
-
-          <svg viewBox="0 0 600 180" width="100%" height="180">
-            <defs>
-              <linearGradient id="dAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.35"/>
-                <stop offset="100%" stop-color="var(--accent)" stop-opacity="0.0"/>
-              </linearGradient>
-            </defs>
-            <path id="dDashboardAreaPath" d="M 20 160 L 580 160 L 580 170 L 20 170 Z" fill="url(#dAreaGrad)"/>
-            <path id="dDashboardLinePath" d="M 20 160 L 580 160" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>
-          </svg>
+          <button class="btn-brass-primary" style="padding:6px 12px; font-size:11.5px;" onclick="window.APP_MOBILE.openEditProfileSheet()">✏️ Edit</button>
         </div>
-
-        <!-- Category Budget Limits -->
-        <div class="table-card-desktop">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 style="font-family:var(--font-serif); font-size:18px; font-weight:600;">Category Ceilings</h3>
-            <button class="btn-brass-primary" style="padding:6px 12px; font-size:12px;" onclick="window.APP_DESKTOP.openAddModal()">+ New Target</button>
-          </div>
-          <div id="dCategoryBudgetList" style="display:flex; flex-direction:column; gap:12px;"></div>
+        <div style="margin-top:14px; padding-top:10px; border-top:1px solid var(--border); display:flex; justify-content:space-between; font-size:11px;">
+          <span style="color:var(--accent-bright); font-weight:600;">✦ Private Wealth Client</span>
+          <span style="color:var(--text-muted);" id="lProfileUserId">ID: #EXP-2026-884</span>
         </div>
-      </section>
+      </div>
 
-      <!-- RECENT TRANSACTION LEDGER TABLE -->
-      <section class="table-card-desktop">
+      <!-- Account & Session Status Card -->
+      <div class="l-card" style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--accent); margin-bottom:2px;">Account &amp; Security</div>
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div>
-            <h3 style="font-family:var(--font-serif); font-size:18px; font-weight:600;">Recent Ledger Records</h3>
-            <p style="font-size:12px; color:var(--text-muted);" id="dTxTableCount">Showing recent transactions</p>
+            <div style="font-size:13px; font-weight:600;" id="mAuthStatusTitle">Logged In Account</div>
+            <div style="font-size:11.5px; color:var(--text-muted);" id="mAuthStatusSub">JWT Session Active</div>
           </div>
-          <div style="display:flex; gap:10px;">
-            <input class="l-input" id="dSearchInput" placeholder="Filter records..." style="width:220px; padding:6px 12px; font-size:13px;">
-            <button class="btn-brass-secondary" onclick="window.APP_DESKTOP.exportCSV()">📥 Export CSV</button>
-          </div>
-        </div>
-
-        <table class="ledger-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Description</th>
-              <th>Category</th>
-              <th>Account</th>
-              <th style="text-align:right;">Amount</th>
-            </tr>
-          </thead>
-          <tbody id="dTransactionTableBody"></tbody>
-        </table>
-      </section>
-
-    </div>
-
-    <!-- ====================================================================
-         VIEW 2: ALL TRANSACTIONS
-         ==================================================================== -->
-    <div class="desktop-content-grid" id="dViewSec-ledger" style="display:none;">
-      <section class="table-card-desktop">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <h3 style="font-family:var(--font-serif); font-size:20px; font-weight:600;">All Transactions</h3>
-          <div class="desktop-filter-strip">
-            <button class="d-pill active" onclick="window.APP_DESKTOP.filterLedger('all', this)">All</button>
-            <button class="d-pill" onclick="window.APP_DESKTOP.filterLedger('expense', this)">Expenses</button>
-            <button class="d-pill" onclick="window.APP_DESKTOP.filterLedger('income', this)">Incomes</button>
-            <button class="d-pill" onclick="window.APP_DESKTOP.filterLedger('Business', this)">Business</button>
-            <button class="d-pill" onclick="window.APP_DESKTOP.filterLedger('Personal', this)">Personal</button>
-          </div>
-        </div>
-
-        <table class="ledger-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Description</th>
-              <th>Category</th>
-              <th>Account</th>
-              <th style="text-align:right;">Amount</th>
-            </tr>
-          </thead>
-          <tbody id="dFullLedgerTableBody"></tbody>
-        </table>
-      </section>
-    </div>
-
-    <!-- ====================================================================
-         VIEW 3: BUDGETS & CATEGORIES
-         ==================================================================== -->
-    <div class="desktop-content-grid" id="dViewSec-budgets" style="display:none;">
-      <section class="table-card-desktop">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <h3 style="font-family:var(--font-serif); font-size:20px; font-weight:600;">Monthly Category Budget Ceilings</h3>
-          <button class="btn-brass-primary" onclick="window.APP_DESKTOP.openNewCatModal()">+ New Category</button>
-        </div>
-        <div id="dFullBudgetsList" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"></div>
-      </section>
-    </div>
-
-    <!-- ====================================================================
-         VIEW 4: ANALYTICS
-         ==================================================================== -->
-    <div class="desktop-content-grid" id="dViewSec-analytics" style="display:none;">
-      <div class="split-dashboard-row">
-        <div class="table-card-desktop">
-          <h3 style="font-family:var(--font-serif); font-size:18px; font-weight:600;">Cashflow Distribution</h3>
-          <div id="dAnalyticsDistList" style="display:flex; flex-direction:column; gap:12px; margin-top:10px;"></div>
-        </div>
-        <div class="table-card-desktop">
-          <h3 style="font-family:var(--font-serif); font-size:18px; font-weight:600;">Monthly Savings Ratio</h3>
-          <div class="money serif" style="font-size:42px; font-weight:700; color:var(--success); margin:20px 0 10px;">58.9%</div>
-          <p style="color:var(--text-muted); font-size:13px; line-height:1.5;">Your spending is well disciplined within monthly ceilings. Inflows exceed outflows by +₹1,06,305.</p>
+          <button type="button" class="btn-brass-secondary" id="mAuthActionBtn" onclick="window.APP_MOBILE.handleAuthAction()" style="padding:8px 16px; font-size:12.5px; font-weight:600; cursor:pointer;">Sign Out</button>
         </div>
       </div>
-    </div>
 
-    <!-- ====================================================================
-         VIEW 5: SETTINGS & USER PROFILE
-         ==================================================================== -->
-    <div class="desktop-content-grid" id="dViewSec-settings" style="display:none;">
-      <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:20px;">
+      <!-- 2. Financial & Accounting Preferences -->
+      <div class="l-card" style="display:flex; flex-direction:column; gap:12px;">
+        <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--accent); margin-bottom:2px;">Financial Preferences</div>
         
-        <!-- Profile & Identity Card -->
-        <div class="table-card-desktop">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <h3 style="font-family:var(--font-serif); font-size:20px; font-weight:600;">Client Profile &amp; Entity</h3>
-            <span style="font-size:11px; font-weight:700; color:var(--accent); background:var(--accent-soft); padding:4px 10px; border-radius:99px;">✦ Private Wealth Tier</span>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:13px; font-weight:600;">Base Currency</div>
+            <div style="font-size:11.5px; color:var(--text-muted);" id="lActiveCurrencyText">Active: Indian Rupee (₹ INR)</div>
           </div>
-
-          <div style="display:flex; flex-direction:column; gap:12px; margin-top:8px;">
-            <div>
-              <label style="font-size:12px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Full Name</label>
-              <input class="l-input" id="dProfileNameInput" placeholder="Ravi Mehta">
-            </div>
-
-            <div>
-              <label style="font-size:12px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Business / Holding Entity</label>
-              <input class="l-input" id="dProfileBizInput" placeholder="Mehta Ventures">
-            </div>
-
-            <div>
-              <label style="font-size:12px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Email Address</label>
-              <input class="l-input" id="dProfileEmailInput" type="email" placeholder="ravi@mehtaventures.com">
-            </div>
-
-            <button class="btn-brass-primary" onclick="window.APP_DESKTOP.saveProfileChanges()" style="width:100%; justify-content:center; padding:12px;">Save Profile Changes</button>
-          </div>
+          <select class="l-input" id="lCurrencySelector" style="width:120px; padding:6px 10px; font-size:12.5px;" onchange="window.APP_MOBILE.changeCurrency(this.value)">
+            <option value="INR|₹">₹ INR</option>
+            <option value="USD|$">$ USD</option>
+            <option value="EUR|€">€ EUR</option>
+            <option value="GBP|£">£ GBP</option>
+            <option value="AED|AED">AED</option>
+            <option value="JPY|¥">¥ JPY</option>
+          </select>
         </div>
 
-        <!-- System & Financial Preferences Card -->
-        <div class="table-card-desktop">
-          <h3 style="font-family:var(--font-serif); font-size:20px; font-weight:600; margin-bottom:6px;">Financial &amp; Cloud Preferences</h3>
-          
-          <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border);">
-            <div>
-              <strong>Base Currency</strong>
-              <div style="font-size:12px; color:var(--text-muted);" id="dActiveCurLabel">Active: INR (₹)</div>
-            </div>
-            <select class="l-input" id="dCurrencySelect" style="width:130px; padding:6px 10px; font-size:13px;" onchange="window.APP_DESKTOP.changeCurrency(this.value)">
-              <option value="INR|₹">₹ INR</option>
-              <option value="USD|$">$ USD</option>
-              <option value="EUR|€">€ EUR</option>
-              <option value="GBP|£">£ GBP</option>
-              <option value="AED|AED">AED</option>
-              <option value="JPY|¥">¥ JPY</option>
-            </select>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding-top:8px; border-top:1px solid var(--border);">
+          <div>
+            <div style="font-size:13px; font-weight:600;">Mask Numbers on Launch</div>
+            <div style="font-size:11.5px; color:var(--text-muted);">Hide balance in public places</div>
           </div>
-
-          <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border);">
-            <div>
-              <strong>Theme Mode</strong>
-              <div style="font-size:12px; color:var(--text-muted);">Dark Obsidian / Light Parchment</div>
-            </div>
-            <button class="btn-brass-primary" onclick="window.APP_STATE.toggleTheme()">🌓 Toggle</button>
-          </div>
-
-          <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border);">
-            <div>
-              <strong>Export Spreadsheet</strong>
-              <div style="font-size:12px; color:var(--text-muted);">Complete CSV download for accounting</div>
-            </div>
-            <button class="btn-brass-secondary" onclick="window.APP_DESKTOP.exportCSV()">📥 Download CSV</button>
-          </div>
+          <input type="checkbox" id="lPrivacyToggle" onchange="window.APP_STATE.toggleMask()" style="accent-color:var(--accent); width:18px; height:18px; cursor:pointer;">
         </div>
 
+        <div style="display:flex; justify-content:space-between; align-items:center; padding-top:8px; border-top:1px solid var(--border);">
+          <div>
+            <div style="font-size:13px; font-weight:600;">Theme Appearance</div>
+            <div style="font-size:11.5px; color:var(--text-muted);">Dark Obsidian / Light Parchment</div>
+          </div>
+          <button class="btn-brass-primary" onclick="window.APP_STATE.toggleTheme()" style="padding:6px 12px; font-size:12px;">🌓 Toggle</button>
+        </div>
+      </div>
+
+      <div style="text-align:center; padding:6px 0 16px; font-family:var(--font-serif); font-style:italic; font-size:12.5px; color:var(--text-muted);">
+        The Ledger — Private Wealth &amp; Cashflow Engine
       </div>
     </div>
 
   </main>
 
-</div>
+  <!-- Permanently Docked Bottom Navigation Bar -->
+  <nav class="ledger-fixed-bottom-bar">
+    <button class="nav-tab-brass active" id="lTabBtn-home" onclick="window.APP_MOBILE.showTab('home')">
+      <span>🏛️</span>
+      <span>Home</span>
+    </button>
+    <button class="nav-tab-brass" id="lTabBtn-transactions" onclick="window.APP_MOBILE.showTab('transactions')">
+      <span>📜</span>
+      <span>Ledger</span>
+    </button>
 
-<!-- Quick Add Modal -->
-<div class="modal-overlay" id="dModalOverlay" onclick="if(event.target.id==='dModalOverlay') window.APP_DESKTOP.closeModal()">
-  <div class="modal-dialog">
+    <!-- Floating Brass Action Button -->
+    <button class="brass-fab" onclick="window.APP_MOBILE.openAddSheet('expense')" title="New Entry">+</button>
+
+    <button class="nav-tab-brass" id="lTabBtn-insights" onclick="window.APP_MOBILE.showTab('insights')">
+      <span>📊</span>
+      <span>Insights</span>
+    </button>
+    <button class="nav-tab-brass" id="lTabBtn-profile" onclick="window.APP_MOBILE.showTab('profile')">
+      <span>👤</span>
+      <span>Profile</span>
+    </button>
+  </nav>
+
+  <!-- 1. Add / Edit Transaction Sheet -->
+<div class="sheet-overlay" id="lAddSheetOverlay" onclick="if(event.target.id==='lAddSheetOverlay') window.APP_MOBILE.closeSheet('lAddSheetOverlay')">
+  <div class="bottom-sheet-panel">
+    <div class="sheet-handle"></div>
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h3 style="font-family:var(--font-serif); font-size:20px; font-weight:600;" id="dModalTitle">Record Transaction</h3>
-      <button onclick="window.APP_DESKTOP.closeModal()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button>
+      <h3 style="font-family:var(--font-serif); font-size:19px; font-weight:600;" id="lSheetTitle">New Entry</h3>
+      <button onclick="window.APP_MOBILE.closeSheet('lAddSheetOverlay')" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
+    </div>
+
+    <div class="l-segmented" style="margin-top:6px;">
+      <button class="l-seg-btn active" id="btnType-exp" onclick="window.APP_MOBILE.setType('expense')">Expense</button>
+      <button class="l-seg-btn" id="btnType-inc" onclick="window.APP_MOBILE.setType('income')">Income</button>
+    </div>
+
+    <div style="display:flex; align-items:baseline; gap:6px; border-bottom:1px solid var(--border); padding:10px 0;">
+      <span style="font-family:var(--font-serif); font-size:26px; color:var(--text-muted);">₹</span>
+      <input class="money" id="lInAmt" type="number" step="0.01" placeholder="0" style="border:none; outline:none; background:transparent; font-family:var(--font-serif); font-size:32px; color:var(--text); width:100%;">
     </div>
 
     <div>
-      <label style="font-size:12px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Amount (₹)*</label>
-      <input class="l-input money serif" type="number" step="0.01" id="dInAmt" placeholder="0.00" style="font-size:26px; font-weight:700; color:var(--accent);">
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Description / Merchant*</label>
+      <input class="l-input" id="lInDesc" placeholder="e.g. AWS Hosting, Retainer">
     </div>
 
-    <div>
-      <label style="font-size:12px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Description / Merchant*</label>
-      <input class="l-input" id="dInDesc" placeholder="e.g. AWS Cloud, WeWork Rent, Lunch">
+    <!-- Category Visual Grid Picker -->
+    <div id="lCatPickerContainer">
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Category</label>
+      <div class="cat-picker-grid" id="lCatGrid"></div>
     </div>
 
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
       <div>
-        <label style="font-size:12px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Account</label>
-        <select class="l-input" id="dInAcct">
+        <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Account</label>
+        <select class="l-input" id="lInAcct">
           <option value="Personal" selected>Personal</option>
           <option value="Business">Business</option>
           <option value="Corporate Card">Corporate Card</option>
-          <option value="Checking">Checking</option>
         </select>
       </div>
       <div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-          <label style="font-size:12px; font-weight:600; color:var(--text-sec);">Category</label>
-          <button type="button" onclick="window.APP_DESKTOP.openNewCatModal()" style="font-size:11px; color:var(--accent); font-weight:600; cursor:pointer; background:none; border:none;">+ New</button>
-        </div>
-        <select class="l-input" id="dInCat"></select>
+        <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Date</label>
+        <input class="l-input" type="date" id="lInDate">
       </div>
     </div>
 
     <div>
-      <label style="font-size:12px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Date</label>
-      <input class="l-input" type="date" id="dInDate">
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Notes (optional)</label>
+      <textarea class="l-input" id="lInNotes" rows="2" placeholder="Add memorandum..."></textarea>
     </div>
 
-    <button class="btn-brass-primary" onclick="window.APP_DESKTOP.saveTransaction()" style="width:100%; padding:13px; font-size:15px; margin-top:6px; justify-content:center;">Save to Ledger</button>
+    <button class="btn-brass-primary" onclick="window.APP_MOBILE.saveEntry()" style="width:100%; padding:13px; font-size:15px; margin-top:6px; justify-content:center;">Save to Ledger</button>
   </div>
 </div>
 
-<!-- New Category Modal -->
-<div class="modal-overlay" id="dNewCatModalOverlay" onclick="if(event.target.id==='dNewCatModalOverlay') window.APP_DESKTOP.closeNewCatModal()">
-  <div class="modal-dialog">
+<!-- 2. Transaction Details Sheet -->
+<div class="sheet-overlay" id="lDetailOverlay" onclick="if(event.target.id==='lDetailOverlay') window.APP_MOBILE.closeSheet('lDetailOverlay')">
+  <div class="bottom-sheet-panel">
+    <div class="sheet-handle"></div>
+    <div id="lDetailContent" style="padding:10px 0;"></div>
+    <div style="display:grid; grid-template-columns:1fr; gap:10px; margin-top:8px;">
+      <button class="btn-brass-primary" style="background:var(--danger-soft); color:var(--danger); justify-content:center;" onclick="window.APP_MOBILE.deleteCurrentTx()">Delete Transaction</button>
+    </div>
+  </div>
+</div>
+
+<!-- 3. Edit Profile Sheet -->
+<div class="sheet-overlay" id="lEditProfileOverlay" onclick="if(event.target.id==='lEditProfileOverlay') window.APP_MOBILE.closeSheet('lEditProfileOverlay')">
+  <div class="bottom-sheet-panel">
+    <div class="sheet-handle"></div>
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h3 style="font-family:var(--font-serif); font-size:20px; font-weight:600;">Create Custom Category</h3>
-      <button onclick="window.APP_DESKTOP.closeNewCatModal()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button>
+      <h3 style="font-family:var(--font-serif); font-size:19px; font-weight:600;">Edit Profile &amp; Business</h3>
+      <button onclick="window.APP_MOBILE.closeSheet('lEditProfileOverlay')" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
     </div>
 
     <div>
-      <label style="font-size:12px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Category Name*</label>
-      <input class="l-input" id="dNewCatName" placeholder="e.g. Marketing, Travel &amp; Lodging, Health">
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Full Name</label>
+      <input class="l-input" id="lEditProfileName" placeholder="e.g. Ravi Mehta">
     </div>
 
     <div>
-      <label style="font-size:12px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:6px;">Select Emoji Icon</label>
-      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
-        <button type="button" class="btn-brass-icon" onclick="window.APP_DESKTOP.selectNewCatEmoji('📢')">📢</button>
-        <button type="button" class="btn-brass-icon" onclick="window.APP_DESKTOP.selectNewCatEmoji('✈️')">✈️</button>
-        <button type="button" class="btn-brass-icon" onclick="window.APP_DESKTOP.selectNewCatEmoji('🎬')">🎬</button>
-        <button type="button" class="btn-brass-icon" onclick="window.APP_DESKTOP.selectNewCatEmoji('🏋️')">🏋️</button>
-        <button type="button" class="btn-brass-icon" onclick="window.APP_DESKTOP.selectNewCatEmoji('🛍️')">🛍️</button>
-        <button type="button" class="btn-brass-icon" onclick="window.APP_DESKTOP.selectNewCatEmoji('☕')">☕</button>
-        <button type="button" class="btn-brass-icon" onclick="window.APP_DESKTOP.selectNewCatEmoji('🎮')">🎮</button>
-        <button type="button" class="btn-brass-icon" onclick="window.APP_DESKTOP.selectNewCatEmoji('🍕')">🍕</button>
-        <button type="button" class="btn-brass-icon" onclick="window.APP_DESKTOP.selectNewCatEmoji('🚗')">🚗</button>
-        <button type="button" class="btn-brass-icon" onclick="window.APP_DESKTOP.selectNewCatEmoji('🏥')">🏥</button>
-        <button type="button" class="btn-brass-icon" onclick="window.APP_DESKTOP.selectNewCatEmoji('🎓')">🎓</button>
-        <button type="button" class="btn-brass-icon" onclick="window.APP_DESKTOP.selectNewCatEmoji('💎')">💎</button>
-      </div>
-      <input class="l-input" id="dNewCatIcon" placeholder="Icon" value="📢" style="font-size:18px; text-align:center; width:80px;">
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Business / Entity Name</label>
+      <input class="l-input" id="lEditProfileBusiness" placeholder="e.g. Mehta Ventures">
     </div>
 
     <div>
-      <label style="font-size:12px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Monthly Budget Limit (₹)</label>
-      <input class="l-input" type="number" id="dNewCatBudget" placeholder="25000" value="25000">
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Email Address</label>
+      <input class="l-input" id="lEditProfileEmail" type="email" placeholder="e.g. ravi@mehtaventures.com">
     </div>
 
-    <button class="btn-brass-primary" onclick="window.APP_DESKTOP.saveNewCategory()" style="width:100%; padding:13px; font-size:15px; margin-top:6px; justify-content:center;">Create Category</button>
+    <button class="btn-brass-primary" onclick="window.APP_MOBILE.saveProfileChanges()" style="width:100%; padding:13px; font-size:15px; margin-top:6px; justify-content:center;">Save Changes</button>
   </div>
 </div>
+
+<!-- 4. New Category Sheet -->
+<div class="sheet-overlay" id="lNewCategorySheetOverlay" onclick="if(event.target.id==='lNewCategorySheetOverlay') window.APP_MOBILE.closeSheet('lNewCategorySheetOverlay')">
+  <div class="bottom-sheet-panel">
+    <div class="sheet-handle"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="font-family:var(--font-serif); font-size:19px; font-weight:600;">Create New Category</h3>
+      <button onclick="window.APP_MOBILE.closeSheet('lNewCategorySheetOverlay')" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
+    </div>
+
+    <div>
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Category Name*</label>
+      <input class="l-input" id="lNewCatName" placeholder="e.g. Marketing &amp; Ads, Travel">
+    </div>
+
+    <div>
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:6px;">Choose Icon</label>
+      <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;" id="lEmojiQuickPicker">
+        <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('📢')">📢</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('✈️')">✈️</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('🎬')">🎬</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('🏋️')">🏋️</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('🛍️')">🛍️</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('☕')">☕</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('🎮')">🎮</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('🍕')">🍕</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('🚗')">🚗</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('🏥')">🏥</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('🎓')">🎓</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('💎')">💎</button>
+      </div>
+      <input class="l-input" id="lNewCatIcon" placeholder="Selected emoji icon" value="📢" style="font-size:18px; text-align:center; width:80px;">
+    </div>
+
+    <div>
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Monthly Budget Limit (₹)</label>
+      <input class="l-input" type="number" id="lNewCatBudget" placeholder="e.g. 25000" value="25000">
+    </div>
+
+    <button class="btn-brass-primary" onclick="window.APP_MOBILE.saveNewCategory()" style="width:100%; padding:13px; font-size:15px; margin-top:6px; justify-content:center;">Create Category</button>
+  </div>
+</div>
+
+<!-- 5. Edit Category Budget Limit Sheet -->
+<div class="sheet-overlay" id="lBudgetSheetOverlay" onclick="if(event.target.id==='lBudgetSheetOverlay') window.APP_MOBILE.closeSheet('lBudgetSheetOverlay')">
+  <div class="bottom-sheet-panel">
+    <div class="sheet-handle"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="font-family:var(--font-serif); font-size:19px; font-weight:600;">Edit Category Limit</h3>
+      <button onclick="window.APP_MOBILE.closeSheet('lBudgetSheetOverlay')" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
+    </div>
+
+    <div>
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Select Category</label>
+      <select class="l-input" id="lBudgetCatSelect"></select>
+    </div>
+
+    <div>
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">New Monthly Limit (₹)</label>
+      <input class="l-input" type="number" id="lBudgetLimitAmt" placeholder="e.g. 35000">
+    </div>
+
+    <button class="btn-brass-primary" onclick="window.APP_MOBILE.saveBudgetLimit()" style="width:100%; padding:13px; font-size:15px; margin-top:6px; justify-content:center;">Update Budget Limit</button>
+  </div>
+</div>
+
+</div><!-- End of ledger-shell -->
+
+<div class="l-toast" id="lToast">Entry saved</div>
 
 <!-- Core Architecture JS Modules -->
 <script src="js/config.js"></script>
@@ -417,6 +540,7 @@
 <script src="js/api.js"></script>
 <script src="js/state.js"></script>
 <script src="js/desktop.js"></script>
+<script src="js/mobile.js"></script>
 <script src="js/app.js"></script>
 
 </body>
