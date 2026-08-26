@@ -481,11 +481,16 @@
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
       <div>
         <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Account</label>
-        <select class="l-input" id="lInAcct">
-          <option value="Personal" selected>Personal</option>
-          <option value="Business">Business</option>
-          <option value="Corporate Card">Corporate Card</option>
-        </select>
+        <input class="l-input" id="lInAcct" list="lAccountList" placeholder="e.g. Personal, HDFC, Cash" value="Personal" autocomplete="off">
+        <datalist id="lAccountList">
+          <option value="Personal">
+          <option value="Business">
+          <option value="Corporate Card">
+          <option value="Cash">
+          <option value="Savings Account">
+          <option value="Salary Account">
+          <option value="Credit Card">
+        </datalist>
       </div>
       <div>
         <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:4px;">Date</label>
@@ -556,8 +561,8 @@
     </div>
 
     <div>
-      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:6px;">Choose Icon</label>
-      <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;" id="lEmojiQuickPicker">
+      <label style="font-size:11.5px; font-weight:600; color:var(--text-sec); display:block; margin-bottom:6px;">Choose Icon or Type Custom Emoji</label>
+      <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;" id="lEmojiQuickPicker">
         <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('📢')">📢</button>
         <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('✈️')">✈️</button>
         <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('🎬')">🎬</button>
@@ -570,8 +575,15 @@
         <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('🏥')">🏥</button>
         <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('🎓')">🎓</button>
         <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('💎')">💎</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('🛒')">🛒</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('🍔')">🍔</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('📱')">📱</button>
+        <button type="button" class="btn-brass-icon" onclick="window.APP_MOBILE.selectNewCatEmoji('💡')">💡</button>
       </div>
-      <input class="l-input" id="lNewCatIcon" placeholder="Selected emoji icon" value="📢" style="font-size:18px; text-align:center; width:80px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <input class="l-input" id="lNewCatIcon" placeholder="Emoji" value="📢" style="font-size:22px; text-align:center; width:65px; padding:6px 0;" maxlength="5">
+        <span style="font-size:11px; color:var(--text-muted); line-height:1.3;">👈 Quick-pick above or type/paste your custom emoji</span>
+      </div>
     </div>
 
     <div>

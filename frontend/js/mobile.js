@@ -619,9 +619,20 @@ window.APP_MOBILE = {
 
     const amt = parseFloat(amtInput ? amtInput.value : "0");
     const desc = descInput ? descInput.value.trim() : "";
-    const acct = acctInput ? acctInput.value : "Business";
+    const acct = (acctInput && acctInput.value.trim()) ? acctInput.value.trim() : "Personal";
     const date = (dateInput && dateInput.value) ? dateInput.value : new Date().toISOString().slice(0, 10);
     const notes = notesInput ? notesInput.value.trim() : "";
+
+    // Dynamically add new custom account to datalist
+    const datalist = document.getElementById("lAccountList");
+    if (datalist && acct) {
+      const existing = Array.from(datalist.options).map(o => o.value);
+      if (!existing.includes(acct)) {
+        const opt = document.createElement("option");
+        opt.value = acct;
+        datalist.appendChild(opt);
+      }
+    }
 
     if (!amt || isNaN(amt) || amt <= 0) {
       window.APP_UTILS.showToast("Please enter a valid positive amount");
