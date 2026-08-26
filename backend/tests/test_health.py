@@ -31,6 +31,21 @@ async def test_v1_health_check_endpoint():
 
 
 @pytest.mark.asyncio
+async def test_app_version_endpoint():
+    """Verify that /api/v1/health/app-version returns update metadata."""
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.get(f"{settings.API_V1_STR}/health/app-version")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["latest_version"] == settings.APP_LATEST_VERSION
+        assert data["version_code"] == settings.APP_LATEST_VERSION_CODE
+        assert data["apk_url"]
+        assert isinstance(data["release_notes"], list)
+        assert isinstance(data["force_update"], bool)
+
+
+@pytest.mark.asyncio
 async def test_legacy_health_check_endpoint():
     """Verify backward compatibility for /api/health."""
     transport = ASGITransport(app=app)

@@ -45,7 +45,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // 4. Attempt async backend handshake
+  // 4. Attempt async backend handshake + in-app update check
   try {
     const health = await window.APP_API.getHealth();
     if (health) {
@@ -53,5 +53,9 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
   } catch (e) {
     console.log("[App] Working in offline/local storage mode");
+  }
+
+  if (window.APP_UPDATER) {
+    window.APP_UPDATER.check();
   }
 });

@@ -350,6 +350,73 @@
 }
 .modal-overlay.open { display: grid; }
 
+.app-update-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(6px);
+  z-index: 400;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.app-update-dialog {
+  width: 100%;
+  max-width: 400px;
+  background: var(--bg-elevated);
+  border-radius: 22px;
+  border: 1px solid var(--border-strong);
+  padding: 22px 22px 18px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.app-update-badge {
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+.app-update-dialog h2 {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text);
+}
+.app-update-meta {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--text-sec);
+  line-height: 1.45;
+}
+.app-update-notes {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--text);
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+.app-update-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+.app-update-actions .btn-brass-primary,
+.app-update-actions .btn-brass-secondary {
+  justify-content: center;
+}
+
 .modal-dialog {
   width: 100%;
   max-width: 480px;

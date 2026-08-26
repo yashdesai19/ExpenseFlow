@@ -68,6 +68,10 @@ window.APP_API = {
     return await this.request("/health");
   },
 
+  async getAppVersion() {
+    return await this.request("/health/app-version");
+  },
+
   async getMe() {
     return await this.request("/auth/me");
   },

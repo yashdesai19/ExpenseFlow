@@ -1,4 +1,4 @@
-from app.schemas.health import HealthCheckResponse
+from app.schemas.health import AppVersionResponse, HealthCheckResponse
 from app.schemas.common import MessageResponse
 from app.schemas.user import (
     UserBase,
@@ -61,6 +61,7 @@ from app.schemas.settings import (
 
 __all__ = [
     "HealthCheckResponse",
+    "AppVersionResponse",
     "MessageResponse",
     "UserBase",
     "UserRegister",

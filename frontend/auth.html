@@ -253,6 +253,9 @@
 
   </div>
 
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/updater.js"></script>
 <script>
 /* ============================================================
    AUTH PAGE — JAVASCRIPT
@@ -461,6 +464,10 @@ async function handleRegister(e) {
 // Open register tab if URL has ?tab=register
 if (new URLSearchParams(window.location.search).get('tab') === 'register') {
   switchTab('register');
+}
+
+if (window.APP_UPDATER) {
+  window.APP_UPDATER.check();
 }
 </script>
 </body>

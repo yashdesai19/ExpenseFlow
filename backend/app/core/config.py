@@ -53,6 +53,36 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 Hours
 
     # --------------------------------------------------------------------------
+    # In-app Android updates (bump these when you upload a new APK)
+    # --------------------------------------------------------------------------
+    APP_LATEST_VERSION: str = "1.0.0"
+    APP_LATEST_VERSION_CODE: int = 1
+    APP_RELEASE_NAME: str = "ExpenseFlow Pro"
+    APP_RELEASE_NOTES: Union[List[str], str] = [
+        "Bug fixes and performance improvements",
+    ]
+    APP_APK_URL: str = "https://github.com/yashdesai19/ExpenseFlow/raw/yash/android/app/release/app-release.apk"
+    APP_WEB_URL: str = "https://expenseflow-1add.onrender.com/ui/"
+    APP_FORCE_UPDATE: bool = False
+
+    @field_validator("APP_RELEASE_NOTES", mode="before")
+    @classmethod
+    def assemble_release_notes(cls, v: Union[str, List[str]]) -> List[str]:
+        if isinstance(v, list):
+            return [str(item).strip() for item in v if str(item).strip()]
+        if isinstance(v, str):
+            text = v.strip()
+            if text.startswith("[") and text.endswith("]"):
+                try:
+                    parsed = json.loads(text)
+                    if isinstance(parsed, list):
+                        return [str(item).strip() for item in parsed if str(item).strip()]
+                except Exception:
+                    pass
+            return [line.strip(" •-\t") for line in text.splitlines() if line.strip()]
+        return []
+
+    # --------------------------------------------------------------------------
     # CORS (Cross-Origin Resource Sharing)
     # --------------------------------------------------------------------------
     BACKEND_CORS_ORIGINS: Union[List[str], str] = [

@@ -4,6 +4,9 @@
 window.APP_CONFIG = {
   APP_NAME: "ExpenseFlow Pro",
   APP_EDITION: "The Ledger",
+  // Must match android/app/build.gradle versionName / versionCode for this APK.
+  APP_VERSION: "1.0.0",
+  APP_VERSION_CODE: 1,
   API_BASE: (() => {
     const hostname = window.location.hostname || "";
     const port = window.location.port || "";
